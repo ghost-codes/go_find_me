@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:project_android/blocs/home_bloc.dart';
 
-class ProfileView extends StatelessWidget {
-  const ProfileView({Key? key}) : super(key: key);
+class DashboardView extends StatelessWidget {
+  DashboardView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       child: Center(
-        child: Text("Profile"),
+        child: Text("DashBoard"),
       ),
     );
   }
