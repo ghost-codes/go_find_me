@@ -13,12 +13,6 @@ class HomeBloc {
 
   PageController pageController = PageController(initialPage: 0);
 
-  StreamController<int> routeStreamcontroller =
-      StreamController<int>.broadcast();
-
-  Stream<int> get routeStream => routeStreamcontroller.stream;
-  StreamSink<int> get _routeSink => routeStreamcontroller.sink;
-
   StreamController<RouterAction> routeActionStreamController =
       StreamController.broadcast();
   Stream<RouterAction> get _routeActionSream =>
