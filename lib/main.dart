@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_android/themes/theme_colors.dart';
 import 'package:project_android/ui/home_view.dart';
 import 'package:project_android/util/route_generator.dart';
 
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: Colors.black,
+        primaryColor: ThemeColors.primary,
       ),
       initialRoute: "/splash",
       onGenerateRoute: RouteGenerator.generateRoute,

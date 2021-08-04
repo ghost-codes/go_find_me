@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:project_android/themes/borderRadius.dart';
+import 'package:project_android/themes/textStyle.dart';
+import 'package:project_android/themes/theme_colors.dart';
 
 class InputDec extends StatelessWidget {
   const InputDec({Key? key}) : super(key: key);
 
   InputDecoration inputDec({
-    String? label,
+    String? hint,
   }) {
     return InputDecoration(
-      border: UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
+      border: OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: ThemeBorderRadius.smallRadiusAll,
       ),
-      labelText: label,
-      enabledBorder: UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
-      ),
-      focusedBorder: UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
-      ),
-      focusColor: Colors.black,
-      labelStyle: TextStyle(color: Colors.black),
+      filled: true,
+      fillColor: ThemeColors.primary.withOpacity(0.07),
+      hintText: hint,
+      hintStyle: ThemeTexTStyle.textField,
     );
   }
 

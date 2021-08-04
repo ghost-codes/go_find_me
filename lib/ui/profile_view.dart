@@ -22,17 +22,22 @@ class ProfileView extends StatelessWidget {
               Center(
                 child: Text(
                   "Profile",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
                 ),
               ),
               Column(
-                  children: List.generate(
-                      10,
-                      (index) => Container(
-                            margin: EdgeInsets.only(top: 10),
-                            height: 35,
-                            color: Colors.grey[300],
-                          )))
+                children: List.generate(
+                  10,
+                  (index) => Container(
+                    margin: EdgeInsets.only(top: 10),
+                    height: 35,
+                    color: Colors.grey[300],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
