@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_android/blocs/home_bloc.dart';
 import 'package:project_android/components/home_body.dart';
+import 'package:project_android/themes/theme_colors.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({Key? key}) : super(key: key);
@@ -16,7 +17,7 @@ class HomeView extends StatelessWidget {
         onPressed: () {
           homeBloc.routeActionSink.add(RouterAction.Create);
         },
-        backgroundColor: Colors.black,
+        backgroundColor: ThemeColors.primary,
         isExtended: false,
         child: Icon(
           Icons.add,
