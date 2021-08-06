@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/themes/borderRadius.dart';
-import 'package:project_android/themes/buttons.dart';
+import 'package:project_android/components/buttons.dart';
 import 'package:project_android/themes/dropShadows.dart';
 import 'package:project_android/themes/padding.dart';
 import 'package:project_android/themes/textStyle.dart';

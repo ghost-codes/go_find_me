@@ -8,17 +8,18 @@ class InputDec extends StatelessWidget {
 
   InputDecoration inputDec({
     String? hint,
+    Icon? prefixIcon,
   }) {
     return InputDecoration(
-      border: OutlineInputBorder(
-        borderSide: BorderSide.none,
-        borderRadius: ThemeBorderRadius.smallRadiusAll,
-      ),
-      filled: true,
-      fillColor: ThemeColors.primary.withOpacity(0.07),
-      hintText: hint,
-      hintStyle: ThemeTexTStyle.textField,
-    );
+        border: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: ThemeBorderRadius.smallRadiusAll,
+        ),
+        filled: true,
+        fillColor: ThemeColors.primary.withOpacity(0.07),
+        hintText: hint,
+        hintStyle: ThemeTexTStyle.textField,
+        prefixIcon: prefixIcon);
   }
 
   @override

@@ -12,13 +12,14 @@ class HomeBody extends StatelessWidget {
   PageController controller = PageController(initialPage: 0);
   @override
   Widget build(BuildContext context) {
-    return PageView(
+    return SafeArea(
+        child: PageView(
       controller: bloc.pageController,
       children: [
         DashboardView(),
         CreatePostView(),
         ProfileView(),
       ],
-    );
+    ));
   }
 }
