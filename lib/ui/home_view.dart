@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:project_android/blocs/home_bloc.dart';
 import 'package:project_android/components/home_body.dart';
+import 'package:project_android/locator.dart';
 import 'package:project_android/themes/theme_colors.dart';
+import 'package:project_android/ui/create_post.dart';
+import 'package:project_android/ui/dashboard_view.dart';
+import 'package:project_android/ui/profile_view.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({Key? key}) : super(key: key);
 
-  HomeBloc homeBloc = HomeBloc();
+  HomeBloc homeBloc = sl<HomeBloc>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: HomeBody(bloc: homeBloc),
+      body: SafeArea(
+          child: PageView(
+        controller: homeBloc.pageController,
+        children: [
+          DashboardView(),
+          CreatePostView(),
+          ProfileView(),
+        ],
+      )),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {

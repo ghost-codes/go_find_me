@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:project_android/locator.dart';
 import 'package:project_android/themes/theme_colors.dart';
 import 'package:project_android/ui/home_view.dart';
 import 'package:project_android/util/route_generator.dart';
 
 void main() {
+  setuplocator();
   runApp(MyApp());
 }
 

@@ -46,4 +46,10 @@ class ThemeTexTStyle {
     color: ThemeColors.primary,
     fontSize: 13,
   );
+
+  static const TextStyle regularwhite = TextStyle(
+    fontFamily: "Montserrat",
+    color: ThemeColors.white,
+    fontSize: 13,
+  );
 }
