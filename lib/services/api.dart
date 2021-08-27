@@ -45,11 +45,8 @@ class Api {
         await dio.get("https://go-find-me.herokuapp.com/api/posts/");
 
     if (response.statusCode == 200) {
-      print("Done");
-      print(response.data);
       return response.data;
     } else {
-      print(response.statusCode);
       return [];
     }
   }

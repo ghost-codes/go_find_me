@@ -9,6 +9,7 @@ import 'package:project_android/themes/dropShadows.dart';
 import 'package:project_android/themes/padding.dart';
 import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
+import 'package:intl/intl.dart';
 
 class DashboardView extends StatefulWidget {
   DashboardView({Key? key}) : super(key: key);
@@ -34,7 +35,6 @@ class _DashboardViewState extends State<DashboardView> {
       child: StreamBuilder<List<Post>>(
           stream: bloc.feedStream,
           builder: (context, snapshot) {
-            print(snapshot.hasData);
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: CustomScrollView(
@@ -77,7 +77,7 @@ class _DashboardViewState extends State<DashboardView> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Title: ${snapshot.data![index].title}",
+                                        "Status: ${snapshot.data![index].status}",
                                         style:
                                             ThemeTexTStyle.titleTextStyleBlack,
                                       ),
@@ -86,8 +86,22 @@ class _DashboardViewState extends State<DashboardView> {
                                           icon: Icon(Icons.more_horiz))
                                     ],
                                   ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Title: ${snapshot.data![index].title}",
+                                        style:
+                                            ThemeTexTStyle.titleTextStyleBlack,
+                                      ),
+                                      Text(DateFormat("dd, MMM").format(
+                                          snapshot.data![index].createdAt ??
+                                              DateTime.now()))
+                                    ],
+                                  ),
                                   Text(
-                                    "12 Jun",
+                                    "Last Seen12 Jun",
                                     style: ThemeTexTStyle.regular,
                                   ),
                                   SizedBox(

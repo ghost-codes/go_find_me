@@ -40,10 +40,10 @@ class CreatePostBloc {
     _images?.forEach((element) async {
       files.add(MultipartFile.fromFileSync(element.path));
     });
-    print(files);
+
     var response = await _api.createPost(
         {"desc": postDescription.text, "title": title.text, "uploads": files});
-    print(json.encode(response));
+
     if (response != null) {
       dashboardBloc.getFeedBody();
       homeBloc.routeActionSink.add(RouterAction.Dashboard);
@@ -57,7 +57,7 @@ class CreatePostBloc {
 
     memImages =
         await Future.wait(_images!.map((e) async => await e.readAsBytes()));
-    print(memImages);
+
     _imagesSink.add(memImages);
   }
 
@@ -65,7 +65,6 @@ class CreatePostBloc {
     _images!.removeAt(index);
     memImages.removeAt(index);
 
-    print(memImages);
     _imagesSink.add(memImages);
   }
 
@@ -82,7 +81,6 @@ class CreatePostBloc {
     });
 
     _imagesSink.add(memImages);
-    print(_images);
   }
 
   CreatePostBloc() {
