@@ -58,7 +58,7 @@ class SignUp extends StatelessWidget {
                             },
                             child: Text(
                               "Login",
-                              style: ThemeTexTStyle.regular,
+                              style: ThemeTexTStyle.regular(),
                             ),
                           )
                         ],
@@ -114,7 +114,7 @@ class SignUpForm extends InputDec {
           ),
           Text(
             "or",
-            style: ThemeTexTStyle.regular,
+            style: ThemeTexTStyle.regular(),
           ),
           SizedBox(
             height: ThemePadding.padBase,

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:project_android/blocs/dashboard_bloc.dart';
 import 'package:project_android/blocs/home_bloc.dart';
@@ -77,23 +78,28 @@ class _DashboardViewState extends State<DashboardView> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "Status: ${snapshot.data![index].status}",
+                                        "Missing: ${snapshot.data![index].title}",
                                         style:
                                             ThemeTexTStyle.titleTextStyleBlack,
                                       ),
-                                      IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(Icons.more_horiz))
+                                      InkWell(
+                                          onTap: () {},
+                                          child: Icon(
+                                            Icons.more_vert,
+                                            color: ThemeColors.grey,
+                                          ))
                                     ],
                                   ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        "Title: ${snapshot.data![index].title}",
-                                        style:
-                                            ThemeTexTStyle.titleTextStyleBlack,
+                                      Expanded(
+                                        child: Text(
+                                          "Last Seen: ${DateFormat("dd, MMM").format(snapshot.data![index].lastSeen!.date ?? DateTime.now())} @ ${snapshot.data![index].lastSeen!.location}",
+                                          style: ThemeTexTStyle.regular(),
+                                          overflow: TextOverflow.fade,
+                                        ),
                                       ),
                                       Text(DateFormat("dd, MMM").format(
                                           snapshot.data![index].createdAt ??
@@ -101,8 +107,9 @@ class _DashboardViewState extends State<DashboardView> {
                                     ],
                                   ),
                                   Text(
-                                    "Last Seen12 Jun",
-                                    style: ThemeTexTStyle.regular,
+                                    "Status: ${snapshot.data![index].status}",
+                                    style: ThemeTexTStyle.regular(
+                                        color: ThemeColors.grey),
                                   ),
                                   SizedBox(
                                     height: ThemePadding.padBase,
@@ -115,11 +122,12 @@ class _DashboardViewState extends State<DashboardView> {
                                   ),
                                   Text(
                                     snapshot.data![index].desc ?? "",
-                                    style: ThemeTexTStyle.regular,
+                                    style: ThemeTexTStyle.regular(),
                                   ),
                                   Text(
                                     "Read More",
-                                    style: ThemeTexTStyle.regularPrim,
+                                    style: ThemeTexTStyle.regular(
+                                        color: ThemeColors.primary),
                                   ),
                                   Container(
                                     // height: 50,
@@ -239,10 +247,32 @@ class ImagesLogic extends StatelessWidget {
                                     color: ThemeColors.black.withOpacity(0.5),
                                   ),
                                 ),
-                                Center(
-                                  child: Text(
-                                    "More",
-                                    style: ThemeTexTStyle.regularwhite,
+                                InkWell(
+                                  onTap: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return Container(
+                                            // margin: EdgeInsets.all(30),
+                                            child: ListView.builder(
+                                                itemCount: imgs!.length,
+                                                itemBuilder: (context, index) {
+                                                  return Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 15.0),
+                                                    child: Image.network(
+                                                        imgs![index]),
+                                                  );
+                                                }),
+                                          );
+                                        });
+                                  },
+                                  child: Center(
+                                    child: Text(
+                                      "+${imgs!.length - 4} More",
+                                      style: ThemeTexTStyle.regular(
+                                          color: ThemeColors.white),
+                                    ),
                                   ),
                                 )
                               ],

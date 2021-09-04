@@ -20,10 +20,13 @@ class CreatePostBloc {
   List<XFile>? _images;
 
   TextEditingController postDescription = TextEditingController();
+  TextEditingController lastSeenLocation = TextEditingController();
 
   TextEditingController title = TextEditingController();
 
-  StreamController<CreatePostActions> createPostActions = StreamController();
+  StreamController<CreatePostActions> createPostActions =
+      StreamController.broadcast();
+  DateTime lastSeenDate = DateTime.now();
 
   Stream<CreatePostActions> get _createPostActionsStream =>
       createPostActions.stream;
@@ -35,16 +38,29 @@ class CreatePostBloc {
   Stream<List<Uint8List>> get imagesStream => _imagesStreamController.stream;
   Sink<List<Uint8List>> get _imagesSink => _imagesStreamController.sink;
 
+  StreamController<DateTime> lastSeenDateController =
+      StreamController<DateTime>.broadcast();
+  Stream<DateTime> get lastSeenDateStream => lastSeenDateController.stream;
+  Sink<DateTime> get lastSeenDateSink => lastSeenDateController.sink;
+
   onCreatePost() async {
     List<MultipartFile> files = [];
     _images?.forEach((element) async {
       files.add(MultipartFile.fromFileSync(element.path));
     });
 
-    var response = await _api.createPost(
-        {"desc": postDescription.text, "title": title.text, "uploads": files});
+    var response = await _api.createPost({
+      "desc": postDescription.text,
+      "title": title.text,
+      "uploads": files,
+      "last_seen": {
+        "location": lastSeenLocation.text,
+        "date": lastSeenDate.toIso8601String()
+      }
+    });
 
     if (response != null) {
+      print(response);
       dashboardBloc.getFeedBody();
       homeBloc.routeActionSink.add(RouterAction.Dashboard);
     }

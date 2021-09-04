@@ -43,4 +43,39 @@ class ThemeButton {
       ),
     );
   }
+
+  static Widget ButtonPrim({String? text, onpressed}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: ThemeColors.primary,
+        borderRadius: ThemeBorderRadius.smallRadiusAll,
+      ),
+      width: double.infinity,
+      child: TextButton(
+        child: Text(
+          text ?? "",
+          style: ThemeTexTStyle.buttonTextStylePrime,
+        ),
+        onPressed: () {
+          onpressed();
+        },
+      ),
+    );
+  }
+
+  static Widget ButtonSec({String? text, VoidCallback? onpressed}) {
+    return Container(
+      decoration: BoxDecoration(
+          color: ThemeColors.white,
+          borderRadius: ThemeBorderRadius.smallRadiusAll,
+          boxShadow: ThemeDropShadow.smallShadow,
+          border: Border.all(color: ThemeColors.primary)),
+      child: TextButton(
+          child: Text(
+            text ?? "",
+            style: ThemeTexTStyle.buttonTextStyleSec,
+          ),
+          onPressed: onpressed),
+    );
+  }
 }

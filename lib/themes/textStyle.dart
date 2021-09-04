@@ -26,7 +26,7 @@ class ThemeTexTStyle {
     fontSize: 15,
     color: ThemeColors.black,
     fontFamily: "Montserrat",
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.bold,
   );
 
   static const TextStyle headerPrim = TextStyle(
@@ -36,11 +36,14 @@ class ThemeTexTStyle {
     fontWeight: FontWeight.bold,
   );
 
-  static const TextStyle regular = TextStyle(
-    fontFamily: "Montserrat",
-    color: ThemeColors.black,
-    fontSize: 13,
-  );
+  static TextStyle regular({Color color = ThemeColors.black}) {
+    return TextStyle(
+      fontFamily: "Montserrat",
+      color: color,
+      fontSize: 13,
+    );
+  }
+
   static const TextStyle regularPrim = TextStyle(
     fontFamily: "Montserrat",
     color: ThemeColors.primary,

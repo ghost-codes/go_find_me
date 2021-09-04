@@ -14,6 +14,7 @@ class Post {
     this.id,
     this.desc,
     this.title,
+    this.lastSeen,
     this.createdAt,
     this.updatedAt,
     this.v,
@@ -27,6 +28,7 @@ class Post {
   String? id;
   String? desc;
   String? title;
+  LastSeen? lastSeen;
   DateTime? createdAt;
   DateTime? updatedAt;
   int? v;
@@ -44,6 +46,7 @@ class Post {
         id: json["_id"],
         desc: json["desc"],
         title: json["title"],
+        lastSeen: LastSeen.fromJson(json["last_seen"]),
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
@@ -58,8 +61,34 @@ class Post {
         "_id": id,
         "desc": desc,
         "title": title,
+        "last_seen": lastSeen!.toJson(),
         "createdAt": createdAt!.toIso8601String(),
         "updatedAt": updatedAt!.toIso8601String(),
         "__v": v,
+      };
+}
+
+class LastSeen {
+  LastSeen({
+    this.location,
+    this.date,
+  });
+
+  String? location;
+  DateTime? date;
+
+  factory LastSeen.fromRawJson(String str) =>
+      LastSeen.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory LastSeen.fromJson(Map<String, dynamic> json) => LastSeen(
+        location: json["location"],
+        date: DateTime.parse(json["date"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "location": location,
+        "date": date!.toIso8601String(),
       };
 }

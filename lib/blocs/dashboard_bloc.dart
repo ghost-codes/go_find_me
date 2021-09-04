@@ -13,6 +13,7 @@ class DashboardBloc {
 
   getFeedBody() async {
     List response = await _api.getFeed();
+
     List<Post> feed = response.map((e) => Post.fromJson(e)).toList();
     _feedSink.add(feed.reversed.toList());
   }

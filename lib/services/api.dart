@@ -9,18 +9,6 @@ import 'package:image_picker/image_picker.dart';
 class Api {
   var dio = Dio();
 
-  // createPost(Map<String, dynamic> map) async {
-  //   var postUri = Uri.parse('https://go-find-me.herokuapp.com/api/posts/');
-  //   var request = new http.MultipartRequest("POST", postUri);
-
-  //   request.fields["desc"] = map["desc"];
-  //   request.files.add(new http.MultipartFile.fromBytes(
-  //       "uploads", await map["uploads"][0].readAsBytes()));
-
-  //   var response = await request.send();
-  //   print(response.statusCode);
-  // }
-
   createPost(Map<String, dynamic> map) async {
     try {
       List<MultipartFile> imgs = [];
@@ -30,6 +18,7 @@ class Api {
       var response = await dio
           .post('https://go-find-me.herokuapp.com/api/posts/', data: formdata);
       if (response.statusCode == 200) {
+        print(json.encode(response.data));
         return response.data;
       } else {
         return null;
@@ -45,6 +34,7 @@ class Api {
         await dio.get("https://go-find-me.herokuapp.com/api/posts/");
 
     if (response.statusCode == 200) {
+      print(response.data);
       return response.data;
     } else {
       return [];
