@@ -18,6 +18,7 @@ class CreatePostBloc {
   HomeBloc homeBloc = sl<HomeBloc>();
   DashboardBloc dashboardBloc = sl<DashboardBloc>();
   List<XFile>? _images;
+  PageController pageController = PageController();
 
   TextEditingController postDescription = TextEditingController();
   TextEditingController lastSeenLocation = TextEditingController();
@@ -43,13 +44,26 @@ class CreatePostBloc {
   Stream<DateTime> get lastSeenDateStream => lastSeenDateController.stream;
   Sink<DateTime> get lastSeenDateSink => lastSeenDateController.sink;
 
+  StreamController<bool> pageState = StreamController.broadcast();
+  Stream<bool> get pageStateStream => pageState.stream;
+  Sink<bool> get pageStateSink => pageState.sink;
+
+  dispose() {
+    createPostActions.close();
+    _imagesStreamController.close();
+    lastSeenDateController.close();
+    pageState.close();
+  }
+
   onCreatePost() async {
+    pageStateSink.add(true);
     List<MultipartFile> files = [];
     _images?.forEach((element) async {
       files.add(MultipartFile.fromFileSync(element.path));
     });
 
     var response = await _api.createPost({
+      "userId": "610014e20e4c3ec688b4a233",
       "desc": postDescription.text,
       "title": title.text,
       "uploads": files,
@@ -62,8 +76,10 @@ class CreatePostBloc {
     if (response != null) {
       print(response);
       dashboardBloc.getFeedBody();
-      homeBloc.routeActionSink.add(RouterAction.Dashboard);
+      pageController.jumpToPage(0);
+      pageStateSink.add(false);
     }
+    pageStateSink.add(false);
   }
 
   onImageUpload() async {

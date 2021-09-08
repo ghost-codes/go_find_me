@@ -11,31 +11,32 @@ class HomeView extends StatelessWidget {
   HomeView({Key? key}) : super(key: key);
 
   HomeBloc homeBloc = sl<HomeBloc>();
+  PageController pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
           child: PageView(
-        controller: homeBloc.pageController,
+        controller: pageController,
         children: [
           DashboardView(),
-          CreatePostView(),
+          CreatePostView(pageController: pageController),
           ProfileView(),
         ],
       )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          homeBloc.routeActionSink.add(RouterAction.Create);
-        },
-        backgroundColor: ThemeColors.primary,
-        isExtended: false,
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-      ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     pageController.jumpToPage(1);
+      //   },
+      //   backgroundColor: ThemeColors.primary,
+      //   isExtended: false,
+      //   child: Icon(
+      //     Icons.add,
+      //     color: Colors.white,
+      //   ),
+      // ),
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
         notchMargin: 5,
@@ -49,14 +50,30 @@ class HomeView extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () {
-                  homeBloc.routeActionSink.add(RouterAction.Dashboard);
+                  pageController.jumpToPage(0);
                 },
                 icon: Icon(Icons.home),
                 color: Colors.black,
               ),
+              InkWell(
+                onTap: () {
+                  pageController.jumpToPage(1);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: ThemeColors.primary,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  padding: EdgeInsets.all(7),
+                  child: Icon(
+                    Icons.add,
+                    color: ThemeColors.white,
+                  ),
+                ),
+              ),
               IconButton(
                 onPressed: () {
-                  homeBloc.routeActionSink.add(RouterAction.Profile);
+                  pageController.jumpToPage(2);
                 },
                 icon: Icon(Icons.settings),
                 color: Colors.black,

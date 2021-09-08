@@ -17,6 +17,7 @@ class Post {
     this.lastSeen,
     this.createdAt,
     this.updatedAt,
+    this.userId,
     this.v,
   });
 
@@ -24,6 +25,7 @@ class Post {
   List<dynamic>? contributions;
   List<dynamic>? privilleged;
   String? status;
+  String? userId;
   int? shares;
   String? id;
   String? desc;
@@ -44,6 +46,7 @@ class Post {
         status: json["status"],
         shares: json["shares"],
         id: json["_id"],
+        userId: json["userId"],
         desc: json["desc"],
         title: json["title"],
         lastSeen: LastSeen.fromJson(json["last_seen"]),

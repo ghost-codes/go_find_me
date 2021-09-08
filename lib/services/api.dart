@@ -11,8 +11,6 @@ class Api {
 
   createPost(Map<String, dynamic> map) async {
     try {
-      List<MultipartFile> imgs = [];
-      List<MultipartFile> files = map["uploads"];
       final formdata = FormData.fromMap(map);
 
       var response = await dio
@@ -26,6 +24,52 @@ class Api {
     } catch (e) {
       print(e);
       return null;
+    }
+  }
+
+  contribution(Map<String, dynamic> map) async {
+    try {
+      var response = await dio.post(
+          'https://go-find-me.herokuapp.com/api/contributions/',
+          data: map);
+      if (response.statusCode == 200) {
+        print(json.encode(response.data));
+        return response.data;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+  editPost(Map<String, dynamic> map, String postId) async {
+    try {
+      final formdata = FormData.fromMap(map);
+
+      Response response = await dio.put(
+          "https://go-find-me.herokuapp.com/api/posts/$postId",
+          data: formdata);
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (err) {
+      print(err);
+      return false;
+    }
+  }
+
+  deletePost(String postId) async {
+    try {
+      Response response = await dio
+          .delete("https://go-find-me.herokuapp.com/api/posts/post/$postId");
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (err) {
+      print(err);
+      return false;
     }
   }
 

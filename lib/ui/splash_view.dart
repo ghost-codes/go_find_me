@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_android/themes/theme_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -20,12 +21,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black,
+      color: ThemeColors.primary,
       child: Center(
-        child: Container(
-          width: 100,
-          height: 100,
-          color: Colors.white,
+        child: CircleAvatar(
+          radius: 30,
+          backgroundColor: Colors.white,
         ),
       ),
     );
