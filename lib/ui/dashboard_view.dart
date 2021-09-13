@@ -234,34 +234,40 @@ class _DashboardViewState extends State<DashboardView> {
                                                   )
                                                 ],
                                               ),
-                                              Icon(
-                                                Icons.list_alt,
-                                                color: ThemeColors.grey,
-                                              ),
                                               InkWell(
-                                                onTap: () async {
-                                                  bool response =
-                                                      await showDialog(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return Contribute(
-                                                              images: snapshot
-                                                                  .data![index]
-                                                                  .imgs,
-                                                            );
-                                                          });
-                                                  if (response) {
-                                                    Navigator.pushNamed(context,
-                                                        "/contribution",
-                                                        arguments: snapshot
-                                                            .data![index].id);
-                                                  }
+                                                onTap: () {
+                                                  Navigator.pushNamed(context,
+                                                      '/postResultMap');
                                                 },
                                                 child: Icon(
-                                                  Icons.comment,
+                                                  Icons.list_alt,
                                                   color: ThemeColors.grey,
                                                 ),
                                               ),
+                                              // InkWell(
+                                              //   onTap: () async {
+                                              //     bool response =
+                                              //         await showDialog(
+                                              //             context: context,
+                                              //             builder: (context) {
+                                              //               return Contribute(
+                                              //                 images: snapshot
+                                              //                     .data![index]
+                                              //                     .imgs,
+                                              //               );
+                                              //             });
+                                              //     if (response) {
+                                              //       Navigator.pushNamed(context,
+                                              //           "/contribution",
+                                              //           arguments: snapshot
+                                              //               .data![index].id);
+                                              //     }
+                                              //   },
+                                              //   child: Icon(
+                                              //     Icons.comment,
+                                              //     color: ThemeColors.grey,
+                                              //   ),
+                                              // ),
                                             ],
                                           )
                                         : Row(

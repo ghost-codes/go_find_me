@@ -4,6 +4,7 @@ import 'package:project_android/ui/contribution.dart';
 import 'package:project_android/ui/editPost.dart';
 import 'package:project_android/ui/home_view.dart';
 import 'package:project_android/ui/login_view.dart';
+import 'package:project_android/ui/result_map_view.dart';
 import 'package:project_android/ui/signup_view.dart';
 import 'package:project_android/ui/splash_view.dart';
 
@@ -14,6 +15,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (context) => SplashScreen());
       case "/":
         return MaterialPageRoute(builder: (context) => HomeView());
+      case "/postResultMap":
+        return MaterialPageRoute(builder: (context) => ResultMapView());
       case "/login":
         return MaterialPageRoute(builder: (context) => Login());
       case "/signup":

@@ -77,6 +77,7 @@ class CreatePostBloc {
       print(response);
       dashboardBloc.getFeedBody();
       pageController.jumpToPage(0);
+
       pageStateSink.add(false);
     }
     pageStateSink.add(false);

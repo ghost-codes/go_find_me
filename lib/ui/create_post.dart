@@ -181,48 +181,38 @@ class _CreatePostViewState extends State<CreatePostView> {
                                             // child: SfDateRangePicker());
 
                                             return AlertDialog(
-                                              content: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                        color:
-                                                            ThemeColors.white),
-                                                    child: Center(
-                                                        child:
-                                                            SfDateRangePicker(
-                                                      maxDate: DateTime.now(),
-                                                      initialDisplayDate:
-                                                          DateTime.now(),
-                                                      showActionButtons: true,
-                                                      onSubmit: (x) {
-                                                        if (x is DateTime) {
-                                                          createPostBloc
-                                                              .lastSeenDateSink
-                                                              .add(x);
-                                                        }
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      onCancel: () {
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      selectionMode:
-                                                          DateRangePickerSelectionMode
-                                                              .single,
-                                                      onSelectionChanged:
-                                                          (DateRangePickerSelectionChangedArgs
-                                                              x) {
-                                                        createPostBloc
-                                                            .lastSeenDateSink
-                                                            .add(x.value);
-                                                      },
-                                                    )),
-                                                  ),
-                                                ],
+                                                content: Container(
+                                              height: 350,
+                                              width: 350     ,
+                                              margin: EdgeInsets.all(5),
+                                              child: SfDateRangePicker(
+                                                maxDate: DateTime.now(),
+                                                initialDisplayDate:
+                                                    DateTime.now(),
+                                                showActionButtons: true,
+                                                onSubmit: (x) {
+                                                  if (x is DateTime) {
+                                                    createPostBloc
+                                                        .lastSeenDateSink
+                                                        .add(x);
+                                                  }
+                                                  Navigator.of(context).pop();
+                                                },
+                                                onCancel: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                selectionMode:
+                                                    DateRangePickerSelectionMode
+                                                        .single,
+                                                onSelectionChanged:
+                                                    (DateRangePickerSelectionChangedArgs
+                                                        x) {
+                                                  createPostBloc
+                                                      .lastSeenDateSink
+                                                      .add(x.value);
+                                                },
                                               ),
-                                            );
+                                            ));
                                           });
                                     }),
                               ],
