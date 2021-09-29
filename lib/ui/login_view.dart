@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/components/buttons.dart';
@@ -27,7 +28,7 @@ class Login extends StatelessWidget {
                 ),
                 CircleAvatar(
                   backgroundColor: ThemeColors.primary,
-                  radius: 80,
+                  radius: 20,
                 ),
                 SizedBox(
                   height: 30,
@@ -79,8 +80,9 @@ class Login extends StatelessWidget {
 }
 
 class LoginForm extends InputDec {
-  const LoginForm({Key? key}) : super(key: key);
+  LoginForm({Key? key}) : super(key: key);
 
+  GoogleSignIn _googleSignIn = GoogleSignIn();
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -113,8 +115,10 @@ class LoginForm extends InputDec {
           ),
           ThemeButton.longButtonSec(
               text: "Google",
-              onpressed: () {
-                Navigator.pushReplacementNamed(context, '/');
+              onpressed: () async {
+                var x = await _googleSignIn.signIn();
+                print(x);
+                // Navigator.pushReplacementNamed(context, '/');
               })
         ],
       ),

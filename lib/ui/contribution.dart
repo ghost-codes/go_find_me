@@ -119,36 +119,40 @@ class Contribution extends StatelessWidget {
                           // child: SfDateRangePicker());
 
                           return AlertDialog(
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  decoration:
-                                      BoxDecoration(color: ThemeColors.white),
-                                  child: Center(
-                                      child: SfDateRangePicker(
-                                    maxDate: DateTime.now(),
-                                    initialSelectedDate: DateTime.now(),
-                                    showActionButtons: true,
-                                    onSubmit: (x) {
-                                      if (x is DateTime) {
-                                        _contributionBloc.dateSink.add(x);
-                                      }
-                                      Navigator.of(context).pop();
-                                    },
-                                    onCancel: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    selectionMode:
-                                        DateRangePickerSelectionMode.single,
-                                    onSelectionChanged:
-                                        (DateRangePickerSelectionChangedArgs
-                                            x) {
-                                      _contributionBloc.dateSink.add(x.value);
-                                    },
-                                  )),
-                                ),
-                              ],
+                            content: Container(
+                              height: 350,
+                              width: 350,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    decoration:
+                                        BoxDecoration(color: ThemeColors.white),
+                                    child: Center(
+                                        child: SfDateRangePicker(
+                                      maxDate: DateTime.now(),
+                                      initialSelectedDate: DateTime.now(),
+                                      showActionButtons: true,
+                                      onSubmit: (x) {
+                                        if (x is DateTime) {
+                                          _contributionBloc.dateSink.add(x);
+                                        }
+                                        Navigator.of(context).pop();
+                                      },
+                                      onCancel: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      selectionMode:
+                                          DateRangePickerSelectionMode.single,
+                                      onSelectionChanged:
+                                          (DateRangePickerSelectionChangedArgs
+                                              x) {
+                                        _contributionBloc.dateSink.add(x.value);
+                                      },
+                                    )),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         });
