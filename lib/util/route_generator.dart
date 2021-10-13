@@ -12,8 +12,8 @@ import 'package:project_android/ui/splash_view.dart';
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings setting) {
     switch (setting.name) {
-      case "/root":
-        return MaterialPageRoute(builder: (context) => RootView());
+      // case "/root":
+      //   return MaterialPageRoute(builder: (context) => RootView());
 
       case "/splash":
         return MaterialPageRoute(builder: (context) => SplashScreen());

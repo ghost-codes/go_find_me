@@ -12,16 +12,19 @@ class AuthenticationBloc {
   GoogleSignIn _googleSignIn = GoogleSignIn();
   Api _api = sl<Api>();
 
+  UserModel? user;
+
   GoogleSignInAccount? googleAccount;
 
   TextEditingController loginPassworrd = TextEditingController();
   TextEditingController loginEmail = TextEditingController();
   TextEditingController googlePassword = TextEditingController();
   TextEditingController googlePasswordConfirm = TextEditingController();
+  TextEditingController googleUsername = TextEditingController();
 
-  StreamController<UserModel?> _userModel = StreamController<UserModel?>();
-  Stream<UserModel?> get userModelStream => _userModel.stream;
-  Sink<UserModel?> get userModelSink => _userModel.sink;
+  // StreamController<UserModel?> _userModel = StreamController<UserModel?>();
+  // Stream<UserModel?> get userModelStream => _userModel.stream;
+  // Sink<UserModel?> get userModelSink => _userModel.sink;
 
   StreamController<bool> setGooglePassword = StreamController<bool>();
   Stream<bool> get setGooglePasswordStream => setGooglePassword.stream;
@@ -31,8 +34,7 @@ class AuthenticationBloc {
     var result = await _api.emailLogin({
       "identity": loginEmail.text,
       "password": loginPassworrd.text,
-    });
-    print(result);
+    }).onError((err) {});
   }
 
   String? googlePasswordValidate(String? value) {
@@ -44,17 +46,18 @@ class AuthenticationBloc {
     }
   }
 
-  googleSignIn() async {
+  googleSignIn(BuildContext context) async {
+    print("ll");
     googleAccount = await _googleSignIn.signIn();
     if (googleAccount != null) {
       UserModel? loginResult =
           await _api.googleSignInAip({"google_id": googleAccount?.id});
       if (loginResult == null) {
-        userModelSink.add(loginResult);
         setGooglePasswordSink.add(true);
       } else {
-        print("login");
-        print(json.encode(loginResult));
+        user = loginResult;
+        print("ll");
+        Navigator.pushReplacementNamed(context, "/");
       }
     }
   }
@@ -66,6 +69,7 @@ class AuthenticationBloc {
         "google_id": googleAccount?.id,
         "email": googleAccount?.email,
         "password": googlePassword.text,
+        "username": googleUsername.text,
       });
     } else {
       googleAccount = await _googleSignIn.signIn();
@@ -77,5 +81,10 @@ class AuthenticationBloc {
       });
     }
     print("sign up");
+  }
+
+  dispose() {
+    // _userModel.close();
+    setGooglePassword.close();
   }
 }

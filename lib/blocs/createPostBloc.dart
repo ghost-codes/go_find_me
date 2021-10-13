@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:project_android/blocs/authenticationBloc.dart';
 import 'package:project_android/blocs/dashboard_bloc.dart';
 import 'package:project_android/blocs/home_bloc.dart';
 import 'package:project_android/locator.dart';
@@ -15,6 +16,8 @@ enum CreatePostActions { CreatePost }
 
 class CreatePostBloc {
   Api _api = sl<Api>();
+  AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
+
   HomeBloc homeBloc = sl<HomeBloc>();
   DashboardBloc dashboardBloc = sl<DashboardBloc>();
   List<XFile>? _images;
@@ -63,7 +66,7 @@ class CreatePostBloc {
     });
 
     var response = await _api.createPost({
-      "userId": "610014e20e4c3ec688b4a233",
+      "userId": _authBloc.user?.id,
       "desc": postDescription.text,
       "title": title.text,
       "uploads": files,

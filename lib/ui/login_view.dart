@@ -167,7 +167,7 @@ class LoginForm extends InputDec {
                       ThemeButton.longButtonSec(
                           text: "Google",
                           onpressed: () async {
-                            _authbloc.googleSignIn();
+                            _authbloc.googleSignIn(context);
                           })
                     ],
                   );
