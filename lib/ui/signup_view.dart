@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:project_android/blocs/authenticationBloc.dart';
 import 'package:project_android/components/text_fields.dart';
+import 'package:project_android/locator.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/themes/dropShadows.dart';
@@ -8,7 +10,9 @@ import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
 
 class SignUp extends StatelessWidget {
-  const SignUp({Key? key}) : super(key: key);
+  SignUp({Key? key}) : super(key: key);
+
+  AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +82,9 @@ class SignUp extends StatelessWidget {
 }
 
 class SignUpForm extends InputDec {
-  const SignUpForm({Key? key}) : super(key: key);
+  SignUpForm({Key? key}) : super(key: key);
+
+  AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +127,9 @@ class SignUpForm extends InputDec {
           ),
           ThemeButton.longButtonSec(
               text: "Google",
-              onpressed: () {
-                Navigator.pushReplacementNamed(context, '/');
+              onpressed: () async {
+                // Navigator.pushReplacementNamed(context, '/');
+                await _authBloc.googleSignUp();
               })
         ],
       ),

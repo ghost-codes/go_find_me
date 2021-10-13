@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:project_android/blocs/authenticationBloc.dart';
 import 'package:project_android/components/text_fields.dart';
+import 'package:project_android/locator.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/themes/dropShadows.dart';
@@ -9,7 +11,7 @@ import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
 
 class Login extends StatelessWidget {
-  const Login({Key? key}) : super(key: key);
+  Login({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -82,46 +84,94 @@ class Login extends StatelessWidget {
 class LoginForm extends InputDec {
   LoginForm({Key? key}) : super(key: key);
 
-  GoogleSignIn _googleSignIn = GoogleSignIn();
+  AuthenticationBloc _authbloc = sl<AuthenticationBloc>();
+
   @override
   Widget build(BuildContext context) {
     return Form(
-      child: Column(
-        children: [
-          TextFormField(
-            decoration: inputDec(hint: "Username or Email"),
-          ),
-          SizedBox(height: 2 * ThemePadding.padBase),
-          TextFormField(
-            decoration: inputDec(hint: "Password"),
-            obscureText: true,
-          ),
-          SizedBox(height: 50),
-          ThemeButton.longButtonPrim(
-            text: "Login",
-            onpressed: () {
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          ),
-          Divider(
-            height: ThemePadding.padBase * 3,
-          ),
-          Text(
-            "or",
-            style: ThemeTexTStyle.regular(),
-          ),
-          SizedBox(
-            height: ThemePadding.padBase,
-          ),
-          ThemeButton.longButtonSec(
-              text: "Google",
-              onpressed: () async {
-                var x = await _googleSignIn.signIn();
-                print(x);
-                // Navigator.pushReplacementNamed(context, '/');
-              })
-        ],
-      ),
+      child: StreamBuilder<bool>(
+          initialData: false,
+          stream: _authbloc.setGooglePasswordStream,
+          builder: (context, snapshot) {
+            return snapshot.data!
+                ? Column(
+                    children: [
+                      TextFormField(
+                        controller: _authbloc.googlePassword,
+                        decoration: inputDec(hint: "Password"),
+                      ),
+                      SizedBox(height: 2 * ThemePadding.padBase),
+                      TextFormField(
+                        validator: (String? value) {
+                          return _authbloc.googlePasswordValidate(value);
+                        },
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        // controller: _authbloc.googlePasswordConfirm,
+                        decoration: inputDec(hint: "Confirm Password"),
+                        obscureText: true,
+                      ),
+                      SizedBox(height: 50),
+                      ThemeButton.longButtonPrim(
+                        text: "Done",
+                        onpressed: () {
+                          _authbloc.googleSignUp();
+                        },
+                      ),
+                      // Divider(
+                      //   height: ThemePadding.padBase * 3,
+                      // ),
+                      // Text(
+                      //   "or",
+                      //   style: ThemeTexTStyle.regular(),
+                      // ),
+                      // SizedBox(
+                      //   height: ThemePadding.padBase,
+                      // ),
+                      // ThemeButton.longButtonSec(
+                      //     text: "Google",
+                      //     onpressed: () async {
+                      //       _authbloc.googleSignUp();
+                      //     })
+                    ],
+                  )
+                : Column(
+                    children: [
+                      TextFormField(
+                        controller: _authbloc.loginEmail,
+                        decoration: inputDec(hint: "Username or Email"),
+                      ),
+                      SizedBox(height: 2 * ThemePadding.padBase),
+                      TextFormField(
+                        controller: _authbloc.loginPassworrd,
+                        decoration: inputDec(hint: "Password"),
+                        obscureText: true,
+                      ),
+                      SizedBox(height: 50),
+                      ThemeButton.longButtonPrim(
+                        text: "Login",
+                        onpressed: () {
+                          // Navigator.pushReplacementNamed(context, '/');
+                          _authbloc.emailLogin();
+                        },
+                      ),
+                      Divider(
+                        height: ThemePadding.padBase * 3,
+                      ),
+                      Text(
+                        "or",
+                        style: ThemeTexTStyle.regular(),
+                      ),
+                      SizedBox(
+                        height: ThemePadding.padBase,
+                      ),
+                      ThemeButton.longButtonSec(
+                          text: "Google",
+                          onpressed: () async {
+                            _authbloc.googleSignIn();
+                          })
+                    ],
+                  );
+          }),
     );
   }
 }
