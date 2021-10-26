@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:project_android/blocs/authenticationBloc.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/services/api.dart';
 
@@ -13,6 +14,7 @@ class EditPostBloc {
   List<dynamic>? oldImages;
 
   Api _api = sl<Api>();
+  AuthenticationBloc authBloc = sl<AuthenticationBloc>();
 
   TextEditingController? postDescription;
   TextEditingController? lastSeenLocation;
@@ -84,7 +86,7 @@ class EditPostBloc {
     // String status = await statusStream.last;
     print("object");
     var response = await _api.editPost({
-      "userId": "610014e20e4c3ec688b4a233",
+      "userId": authBloc.user?.id,
       "status": status,
       "desc": postDescription!.text,
       "title": title!.text,

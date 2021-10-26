@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_android/blocs/authenticationBloc.dart';
+import 'package:project_android/components/passwordTextField.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/themes/borderRadius.dart';
@@ -29,9 +30,24 @@ class SignUp extends StatelessWidget {
                 SizedBox(
                   height: 30,
                 ),
-                CircleAvatar(
-                  backgroundColor: ThemeColors.primary,
-                  radius: 20,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: ThemeColors.primary,
+                      radius: 20,
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      "GoFindMe",
+                      style: TextStyle(
+                          color: ThemeColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 30),
+                    )
+                  ],
                 ),
                 SizedBox(
                   height: 30,
@@ -81,7 +97,7 @@ class SignUp extends StatelessWidget {
   }
 }
 
-class SignUpForm extends InputDec {
+class SignUpForm extends StatelessWidget with InputDec {
   SignUpForm({Key? key}) : super(key: key);
 
   AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
@@ -99,9 +115,9 @@ class SignUpForm extends InputDec {
             decoration: inputDec(hint: "Email"),
           ),
           SizedBox(height: 2 * ThemePadding.padBase),
-          TextFormField(
-            decoration: inputDec(hint: "Password"),
-            obscureText: true,
+          PasswordTextField(
+            inputDec: inputDec(hint: "Password"),
+            controller: TextEditingController(),
           ),
           SizedBox(height: 2 * ThemePadding.padBase),
           TextFormField(
@@ -128,8 +144,7 @@ class SignUpForm extends InputDec {
           ThemeButton.longButtonSec(
               text: "Google",
               onpressed: () async {
-                // Navigator.pushReplacementNamed(context, '/');
-                await _authBloc.googleSignUp();
+                await _authBloc.googleSignUp(context);
               })
         ],
       ),

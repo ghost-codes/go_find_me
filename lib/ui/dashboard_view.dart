@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:project_android/blocs/authenticationBloc.dart';
 import 'package:project_android/blocs/dashboard_bloc.dart';
 import 'package:project_android/blocs/home_bloc.dart';
 import 'package:project_android/components/buttons.dart';
@@ -27,10 +28,10 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   DashboardBloc bloc = sl<DashboardBloc>();
   HomeBloc homeBloc = sl<HomeBloc>();
+  AuthenticationBloc authBloc = sl<AuthenticationBloc>();
 
   @override
   void initState() {
-    // TODO: implement initState
     bloc.getFeedBody();
     super.initState();
   }
@@ -89,7 +90,7 @@ class _DashboardViewState extends State<DashboardView> {
                                             ThemeTexTStyle.titleTextStyleBlack,
                                       ),
                                       snapshot.data![index].userId ==
-                                              "610014e20e4c3ec688b4a233"
+                                              authBloc.user?.id
                                           ? InkWell(
                                               onTap: () async {
                                                 var res = await showDialog(
@@ -189,7 +190,7 @@ class _DashboardViewState extends State<DashboardView> {
                                     padding:
                                         EdgeInsets.all(ThemePadding.padBase),
                                     child: snapshot.data![index].userId ==
-                                            "610014e20e4c3ec688b4a233"
+                                            authBloc.user?.id
                                         ? Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -566,7 +567,7 @@ class DisplayImages extends StatelessWidget {
   }
 }
 
-class AppBarWidget extends InputDec {
+class AppBarWidget extends StatelessWidget with InputDec {
   @override
   Widget build(BuildContext context) {
     return Row(

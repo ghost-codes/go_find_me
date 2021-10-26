@@ -10,35 +10,115 @@ import 'package:project_android/models/UserModel.dart';
 import 'package:project_android/services/sharedPref.dart';
 
 class Api {
-  Dio dio = Dio(BaseOptions(baseUrl: 'https://go-find-me.herokuapp.com/api'));
   SharedPreferencesService sharedPref = sl<SharedPreferencesService>();
+  Dio dio = Dio(BaseOptions(
+    baseUrl: 'https://go-find-me.herokuapp.com/api',
+  ));
+
+  Api() {
+    dio.interceptors
+        .add(InterceptorsWrapper(onRequest: (request, handler) async {
+      String? token = await sharedPref.getStringValuesSF("accessToken");
+      if (token != null && token != '') {
+        request.headers['Authorization'] = "Bearer " + token;
+      }
+      return handler.next(request);
+    }, onError: (DioError e, handler) async {
+      if (e.response?.statusCode == 403) {
+        try {
+          String? refreshToken =
+              await sharedPref.getStringValuesSF("refreshToken");
+
+          if (refreshToken != null && refreshToken != '') {
+            await dio.post('/users/refresh_token',
+                data: {"token": refreshToken}).then((value) async {
+              if (value.statusCode == 200) {
+                String token = value.data["accessToken"];
+                await sharedPref.addStringToSF(
+                    "accessToken", value.data?["accessToken"]);
+                await sharedPref.addStringToSF(
+                    "refreshToken", value.data?["refreshToken"]);
+
+                e.requestOptions.headers["Authorization"] = "Bearer " + token;
+
+                // Create request with new access Token
+                final opts = new Options(
+                  method: e.requestOptions.method,
+                  headers: e.requestOptions.headers,
+                );
+                final cloneReq = await dio.request(e.requestOptions.path,
+                    options: opts,
+                    data: e.requestOptions.data,
+                    queryParameters: e.requestOptions.queryParameters);
+
+                return handler.resolve(cloneReq);
+              }
+              // return e;
+            });
+            // return dio;
+          }
+        } catch (err) {
+          print(err);
+        }
+      }
+      return handler.next(e);
+    }));
+  }
+
+  Future<UserModel?> tokenAuthentication() async {
+    try {
+      Response<Map<String, dynamic>> response =
+          await dio.get('/users/login/token_auth');
+      if (response.statusCode! >= 200 && response.statusCode! <= 300) {
+        UserModel user = UserModel.fromJson(response.data ?? {});
+
+        return user;
+      } else {
+        return Future.error("Error Occured");
+      }
+    } catch (err) {
+      return Future.error(err);
+    }
+  }
 
   // Authentication Apis
-  emailLogin(Map<String, dynamic> map) async {
+  Future<UserModel?> emailLogin(Map<String, dynamic> map) async {
     try {
       Response response = await dio.post('/users/login/email/', data: map);
 
       if (response.statusCode! >= 200 && response.statusCode! <= 300) {
-        return response.data;
+        UserModel user = UserModel.fromJson(response.data?["user"] ?? {});
+        await sharedPref.addStringToSF(
+            "accessToken", response.data?["accessToken"]);
+        await sharedPref.addStringToSF(
+            "refreshToken", response.data?["refreshToken"]);
+
+        return user;
+      } else {
+        return Future.error("Error Occured");
       }
-    } catch (e) {
-      print(e);
-      return null;
+    } on DioError catch (err) {
+      return Future.error(err);
     }
   }
 
-  googleSignUp(Map<String, dynamic> data) async {
+  Future<UserModel?> googleSignUp(Map<String, dynamic> data) async {
     try {
       Response response =
           await dio.post('/users/sign_up/google_auth', data: data);
       if (response.statusCode! >= 200 && response.statusCode! <= 300) {
-        return response.data;
+        UserModel user = UserModel.fromJson(response.data?["user"] ?? {});
+        await sharedPref.addStringToSF(
+            "accessToken", response.data?["accessToken"]);
+        await sharedPref.addStringToSF(
+            "refreshToken", response.data?["refreshToken"]);
+
+        return user;
       } else {
-        return null;
+        return Future.error("Login Error");
       }
-    } catch (err) {
-      print(err);
-      return null;
+    } on DioError catch (err) {
+      return Future.error(err);
     }
   }
 
@@ -47,11 +127,12 @@ class Api {
       Response<Map<String, dynamic>> response =
           await dio.post('/users/login/google_auth', data: data);
       if (response.statusCode! >= 200 && response.statusCode! <= 300) {
-        UserModel user = UserModel.fromJson(response.data ?? {});
+        UserModel user = UserModel.fromJson(response.data?["user"] ?? {});
         await sharedPref.addStringToSF(
             "accessToken", response.data?["accessToken"]);
         await sharedPref.addStringToSF(
             "refreshToken", response.data?["refreshToken"]);
+
         return user;
       } else {
         return null;
@@ -66,6 +147,7 @@ class Api {
 
   createPost(Map<String, dynamic> map) async {
     try {
+      print(map);
       final formdata = FormData.fromMap(map);
 
       var response = await dio.post('/posts/', data: formdata);
@@ -123,7 +205,7 @@ class Api {
   }
 
   Future<List<dynamic>> getFeed() async {
-    Response response = await dio.get("/api/posts/");
+    Response response = await dio.get("/posts/");
 
     if (response.statusCode == 200) {
       print(response.data);

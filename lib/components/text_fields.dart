@@ -3,8 +3,8 @@ import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
 
-class InputDec extends StatelessWidget {
-  const InputDec({Key? key}) : super(key: key);
+class InputDec {
+  // const InputDec();
 
   InputDecoration inputDec({
     String? hint,
@@ -22,9 +22,9 @@ class InputDec extends StatelessWidget {
         prefixIcon: prefixIcon);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
+  // @override
+  // Widget build(BuildContext context) {
+  //   // TODO: implement build
+  //   throw UnimplementedError();
+  // }
 }
