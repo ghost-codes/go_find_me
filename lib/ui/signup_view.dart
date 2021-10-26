@@ -10,14 +10,16 @@ import 'package:project_android/themes/padding.dart';
 import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatelessWidget with InputDec {
   SignUp({Key? key}) : super(key: key);
 
   AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
+  GlobalKey _scaffold = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffold,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -52,46 +54,117 @@ class SignUp extends StatelessWidget {
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  height: 620,
-                  padding: EdgeInsets.all(2.5 * ThemePadding.padBase),
-                  decoration: BoxDecoration(
-                    color: ThemeColors.white,
-                    borderRadius: ThemeBorderRadius.bigRadiusAll,
-                    boxShadow: ThemeDropShadow.bigShadow,
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: ThemePadding.padBase * 2,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Sign Up ",
-                            style: ThemeTexTStyle.headerPrim,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pushReplacementNamed(context, '/login');
-                            },
-                            child: Text(
-                              "Login",
-                              style: ThemeTexTStyle.regular(),
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 2.5 * ThemePadding.padBase),
-                      SignUpForm(),
-                    ],
-                  ),
-                ),
+                StreamBuilder<bool>(
+                    initialData: false,
+                    stream: _authBloc.isAuthenticatingStream,
+                    builder: (context, snapshot) {
+                      return snapshot.data!
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                color: ThemeColors.primary,
+                              ),
+                            )
+                          : Container(
+                              // height: 620,
+                              padding:
+                                  EdgeInsets.all(2.5 * ThemePadding.padBase),
+                              decoration: BoxDecoration(
+                                color: ThemeColors.white,
+                                borderRadius: ThemeBorderRadius.bigRadiusAll,
+                                boxShadow: ThemeDropShadow.bigShadow,
+                              ),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    height: ThemePadding.padBase * 2,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Sign Up ",
+                                        style: ThemeTexTStyle.headerPrim,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushReplacementNamed(
+                                              context, '/login');
+                                        },
+                                        child: Text(
+                                          "Login",
+                                          style: ThemeTexTStyle.regular(),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(height: 2.5 * ThemePadding.padBase),
+                                  signup()
+                                ],
+                              ),
+                            );
+                    }),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Form signup() {
+    return Form(
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _authBloc.signUpUsername,
+            decoration: inputDec(hint: "Username"),
+          ),
+          SizedBox(height: 2 * ThemePadding.padBase),
+          TextFormField(
+            controller: _authBloc.singupEmail,
+            decoration: inputDec(hint: "Email"),
+          ),
+          SizedBox(height: 2 * ThemePadding.padBase),
+          PasswordTextField(
+            inputDec: inputDec(hint: "Password"),
+            controller: _authBloc.signUpPassword,
+          ),
+          SizedBox(height: 2 * ThemePadding.padBase),
+          TextFormField(
+            autovalidateMode: AutovalidateMode.always,
+            validator: (value) {
+              return _authBloc.passwordValidate(
+                  value, _authBloc.signUpPassword);
+            },
+            decoration: inputDec(hint: "Confirm Password"),
+            obscureText: true,
+          ),
+          SizedBox(height: 50),
+          ThemeButton.longButtonPrim(
+            text: "Sign Up",
+            onpressed: () {
+              _authBloc.emailSignUp(_scaffold.currentContext!);
+              // Navigator.pushReplacementNamed(_scaffold.currentContext!, '/');
+            },
+          ),
+          Divider(
+            height: ThemePadding.padBase * 3,
+          ),
+          Text(
+            "or",
+            style: ThemeTexTStyle.regular(),
+          ),
+          SizedBox(
+            height: ThemePadding.padBase,
+          ),
+          ThemeButton.longButtonSec(
+            text: "Google",
+            onpressed: () async {
+              await _authBloc.googleSignUp(_scaffold.currentContext!);
+            },
+          )
+        ],
       ),
     );
   }

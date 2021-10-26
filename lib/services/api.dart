@@ -143,6 +143,26 @@ class Api {
     }
   }
 
+  Future<UserModel?> emailSignUp(Map<String, dynamic> data) async {
+    try {
+      Response response = await dio.post('/users/sign_up/email', data: data);
+
+      if (response.statusCode! >= 200 && response.statusCode! <= 300) {
+        UserModel user = UserModel.fromJson(response.data?["user"] ?? {});
+        await sharedPref.addStringToSF(
+            "accessToken", response.data?["accessToken"]);
+        await sharedPref.addStringToSF(
+            "refreshToken", response.data?["refreshToken"]);
+
+        return user;
+      } else {
+        return Future.error("Error Occured");
+      }
+    } on DioError catch (err) {
+      return Future.error(err);
+    }
+  }
+
   ///////////////////////////////////////////////////////
 
   createPost(Map<String, dynamic> map) async {

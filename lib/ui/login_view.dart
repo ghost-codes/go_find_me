@@ -25,7 +25,6 @@ class _LoginState extends State<Login> with InputDec {
 
   @override
   void dispose() {
-    _authbloc.isAuthenticating.close();
     super.dispose();
   }
 
@@ -163,7 +162,8 @@ class _LoginState extends State<Login> with InputDec {
           SizedBox(height: 1.5 * ThemePadding.padBase),
           TextFormField(
             validator: (String? value) {
-              return _authbloc.googlePasswordValidate(value);
+              return _authbloc.passwordValidate(
+                  value, _authbloc.googlePassword);
             },
             autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: inputDec(hint: "Confirm Password"),
@@ -251,7 +251,8 @@ class LoginForm extends StatelessWidget with InputDec {
                       SizedBox(height: 1.5 * ThemePadding.padBase),
                       TextFormField(
                         validator: (String? value) {
-                          return _authbloc.googlePasswordValidate(value);
+                          return _authbloc.passwordValidate(
+                              value, _authbloc.googlePassword);
                         },
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         decoration: inputDec(hint: "Confirm Password"),

@@ -21,11 +21,17 @@ class AuthenticationBloc {
 
   GoogleSignInAccount? googleAccount;
 
+  // Login TextEditor Controllers
   TextEditingController loginPassworrd = TextEditingController();
   TextEditingController loginEmail = TextEditingController();
   TextEditingController googlePassword = TextEditingController();
   TextEditingController googlePasswordConfirm = TextEditingController();
   TextEditingController googleUsername = TextEditingController();
+
+  // Signup TextEditor Controllers
+  TextEditingController signUpPassword = TextEditingController();
+  TextEditingController singupEmail = TextEditingController();
+  TextEditingController signUpUsername = TextEditingController();
 
   StreamController<bool> setGooglePassword = StreamController<bool>.broadcast();
   Stream<bool> get setGooglePasswordStream => setGooglePassword.stream;
@@ -106,9 +112,47 @@ class AuthenticationBloc {
     }
   }
 
-  String? googlePasswordValidate(String? value) {
+  emailSignUp(BuildContext context) async {
+    isAuthenticatingSink.add(true);
+    UserModel? result = await _api.emailSignUp({
+      "username": signUpUsername.text,
+      "password": signUpPassword.text,
+      "email": singupEmail.text,
+    }).onError((err, stacktrace) {
+      isAuthenticatingSink.add(false);
+      if (err is DioError) {
+        if (err is DioError &&
+            err.type == DioErrorType.other &&
+            err.error == SocketException) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Check internet Connectivity",
+                style: ThemeTexTStyle.regularwhite,
+              ),
+              backgroundColor: ThemeColors.accent,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(err.response?.data["message"]),
+              backgroundColor: ThemeColors.accent,
+            ),
+          );
+        }
+      }
+    });
+    isAuthenticatingSink.add(false);
+    if (result != null) {
+      user = result;
+      Navigator.pushReplacementNamed(context, "/");
+    }
+  }
+
+  String? passwordValidate(String? value, TextEditingController pass) {
     print(value);
-    if (googlePassword.text == value) {
+    if (pass.text == value) {
       return null;
     } else {
       return "Passwords do not match";
@@ -191,5 +235,6 @@ class AuthenticationBloc {
 
   dispose() {
     setGooglePassword.close();
+    isAuthenticating.close();
   }
 }
