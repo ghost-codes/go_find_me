@@ -58,17 +58,7 @@ class Contribution extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.end,
-          //   children: [
-          //     InkWell(
-          //       onTap: () {
-          //         Navigator.of(context).pop();
-          //       },
-          //       child: Icon(Icons.close),
-          //     )
-          //   ],
-          // ),
+         
           LocationTextField(
             hintText: "Seen Location",
             controller: _contributionBloc.locationController,
@@ -79,7 +69,7 @@ class Contribution extends StatelessWidget {
           ),
           Text('Pick Time of sighting'),
           Container(
-            // height: 70,
+       
             child: TimePickerSpinner(
               onTimeChange: (time) {
                 _contributionBloc.timeValue = time;
@@ -166,7 +156,6 @@ class Contribution extends StatelessWidget {
               text: "Submit",
               onpressed: () {
                 _contributionBloc.postId = postId;
-                print("hello");
                 _contributionBloc.onSubmit(context);
               }),
         ],

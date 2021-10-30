@@ -12,12 +12,17 @@ import 'package:project_android/models/UserModel.dart';
 import 'package:project_android/services/api.dart';
 import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
+import 'package:project_android/ui/home_view.dart';
+import 'package:project_android/ui/login_view.dart';
 
 class AuthenticationBloc {
   GoogleSignIn _googleSignIn = GoogleSignIn();
   Api _api = sl<Api>();
 
   UserModel? user;
+  StreamController<UserModel?> userModel = StreamController<UserModel?>();
+  Stream<UserModel?> get userModelStream => userModel.stream;
+  Sink<UserModel?> get userModelSink => userModel.sink;
 
   GoogleSignInAccount? googleAccount;
 
@@ -56,9 +61,12 @@ class AuthenticationBloc {
     });
     if (result != null) {
       user = result;
+      userModelSink.add(result);
+      print("dashboard");
       isTokenAuthenticatingSink.add(false);
-      Navigator.pushReplacementNamed(context, "/");
-    } else if (isInternetConnected) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomeView()));
+    } else if (!isInternetConnected) {
       isTokenAuthenticatingSink.add(false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -70,8 +78,10 @@ class AuthenticationBloc {
         ),
       );
     } else {
+      print("auth");
       isTokenAuthenticatingSink.add(false);
-      Navigator.pushReplacementNamed(context, "/login");
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Login()));
     }
   }
 
@@ -108,7 +118,9 @@ class AuthenticationBloc {
     isAuthenticatingSink.add(false);
     if (result != null) {
       user = result;
-      Navigator.pushReplacementNamed(context, "/");
+      userModelSink.add(result);
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomeView()));
     }
   }
 
@@ -146,7 +158,9 @@ class AuthenticationBloc {
     isAuthenticatingSink.add(false);
     if (result != null) {
       user = result;
-      Navigator.pushReplacementNamed(context, "/");
+      userModelSink.add(result);
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomeView()));
     }
   }
 
@@ -182,11 +196,12 @@ class AuthenticationBloc {
       });
       isAuthenticatingSink.add(false);
       if (loginResult == null) {
-        print(loginResult);
         setGooglePasswordSink.add(true);
       } else {
         user = loginResult;
-        Navigator.pushReplacementNamed(context, "/");
+        userModelSink.add(loginResult);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomeView()));
       }
     }
   }
@@ -220,7 +235,9 @@ class AuthenticationBloc {
       isAuthenticatingSink.add(false);
       if (result != null) {
         user = result;
-        Navigator.pushReplacementNamed(context, "/");
+        userModelSink.add(result);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomeView()));
       }
     } else {
       googleAccount = await _googleSignIn.signIn();
@@ -230,6 +247,12 @@ class AuthenticationBloc {
         "email": googleAccount?.email,
         "password": googlePassword.text,
       });
+      if (result != null) {
+        user = result;
+        userModelSink.add(result);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomeView()));
+      }
     }
   }
 

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/gestures.dart';
+
 import 'package:flutter/material.dart';
 import 'package:project_android/blocs/authenticationBloc.dart';
 import 'package:project_android/blocs/dashboard_bloc.dart';
@@ -9,6 +9,7 @@ import 'package:project_android/blocs/home_bloc.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/locator.dart';
+import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/models/PostModel.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/themes/dropShadows.dart';
@@ -17,6 +18,8 @@ import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:project_android/ui/contribution.dart';
+import 'package:project_android/ui/editPost.dart';
+import 'package:project_android/ui/result_map_view.dart';
 
 class DashboardView extends StatefulWidget {
   DashboardView({Key? key}) : super(key: key);
@@ -42,7 +45,7 @@ class _DashboardViewState extends State<DashboardView> {
       child: StreamBuilder<List<Post>>(
           stream: bloc.feedStream,
           builder: (context, snapshot) {
-            print(snapshot.data != null);
+           
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: CustomScrollView(
@@ -63,299 +66,297 @@ class _DashboardViewState extends State<DashboardView> {
                     backgroundColor: ThemeColors.white,
                   ),
                   SliverList(
-                    delegate: SliverChildListDelegate(snapshot.hasData &&
-                            snapshot.data != null
-                        ? List.generate(
-                            snapshot.data!.length,
-                            (index) => Container(
-                              padding:
-                                  EdgeInsets.all(ThemePadding.padBase * 2.0),
-                              margin: EdgeInsets.symmetric(
-                                  vertical: ThemePadding.padBase),
-                              decoration: BoxDecoration(
-                                color: ThemeColors.white,
-                                borderRadius: ThemeBorderRadius.smallRadiusAll,
-                                boxShadow: ThemeDropShadow.smallShadow,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Missing: ${snapshot.data![index].title}",
-                                        style:
-                                            ThemeTexTStyle.titleTextStyleBlack,
-                                      ),
-                                      snapshot.data![index].userId ==
-                                              authBloc.user?.id
-                                          ? InkWell(
-                                              onTap: () async {
-                                                var res = await showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return AlertDialog(
-                                                        title: Text(
-                                                            "Post Actions"),
-                                                        content: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: [
-                                                            ListTile(
-                                                              title: Text(
-                                                                  "Edit Post"),
-                                                              onTap: () async {
-                                                                bool res = await Navigator.pushNamed(
-                                                                    context,
-                                                                    '/edit_post',
-                                                                    arguments: snapshot
-                                                                            .data![
-                                                                        index]) as bool;
-                                                                if (res)
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop(
-                                                                          true);
-                                                              },
-                                                            ),
-                                                            ListTile(
-                                                              title: Text(
-                                                                  "Delete Post"),
-                                                              onTap: () {
-                                                                bloc.deletePost(
-                                                                    snapshot
-                                                                        .data![
-                                                                            index]
-                                                                        .id!,
-                                                                    context);
-                                                              },
-                                                            )
-                                                          ],
-                                                        ),
-                                                      );
-                                                    });
-                                                if (res) bloc.getFeedBody();
-                                              },
-                                              child: Icon(
-                                                Icons.more_vert,
-                                                color: ThemeColors.grey,
-                                              ))
-                                          : SizedBox.shrink(),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          "Last Seen: ${DateFormat("dd, MMM").format(snapshot.data![index].lastSeen!.date ?? DateTime.now())} @ ${snapshot.data![index].lastSeen!.location}",
-                                          style: ThemeTexTStyle.regular(),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      SizedBox(width: ThemePadding.padBase),
-                                      Text(DateFormat("dd, MMM").format(
-                                          snapshot.data![index].createdAt ??
-                                              DateTime.now()))
-                                    ],
-                                  ),
-                                  Text(
-                                    "Status: ${snapshot.data![index].status}",
-                                    style: ThemeTexTStyle.regular(
-                                        color: ThemeColors.grey),
-                                  ),
-                                  SizedBox(
-                                    height: ThemePadding.padBase,
-                                  ),
-                                  ImagesLogic(
-                                    imgs: snapshot.data![index].imgs,
-                                  ),
-                                  SizedBox(
-                                    height: ThemePadding.padBase,
-                                  ),
-                                  Text(
-                                    snapshot.data![index].desc ?? "",
-                                    style: ThemeTexTStyle.regular(),
-                                  ),
-                                  Text(
-                                    "Read More",
-                                    style: ThemeTexTStyle.regular(
-                                        color: ThemeColors.primary),
-                                  ),
-                                  Container(
-                                    // height: 50,
-                                    padding:
-                                        EdgeInsets.all(ThemePadding.padBase),
-                                    child: snapshot.data![index].userId ==
-                                            authBloc.user?.id
-                                        ? Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.how_to_vote,
-                                                    color: ThemeColors.grey,
-                                                  ),
-                                                  SizedBox(
-                                                    width:
-                                                        ThemePadding.padBase /
-                                                            2,
-                                                  ),
-                                                  Text(
-                                                    "${snapshot.data![index].contributions!.length}",
-                                                    style:
-                                                        ThemeTexTStyle.regular(
-                                                            color: ThemeColors
-                                                                .grey),
-                                                  )
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.share,
-                                                    color: ThemeColors.grey,
-                                                  ),
-                                                  SizedBox(
-                                                    width:
-                                                        ThemePadding.padBase /
-                                                            2,
-                                                  ),
-                                                  Text(
-                                                    "${snapshot.data![index].shares!}",
-                                                    style:
-                                                        ThemeTexTStyle.regular(
-                                                            color: ThemeColors
-                                                                .grey),
-                                                  )
-                                                ],
-                                              ),
-                                              InkWell(
-                                                onTap: () {
-                                                  Navigator.pushNamed(context,
-                                                      '/postResultMap');
-                                                },
-                                                child: Icon(
-                                                  Icons.list_alt,
-                                                  color: ThemeColors.grey,
-                                                ),
-                                              ),
-                                              // InkWell(
-                                              //   onTap: () async {
-                                              //     bool response =
-                                              //         await showDialog(
-                                              //             context: context,
-                                              //             builder: (context) {
-                                              //               return Contribute(
-                                              //                 images: snapshot
-                                              //                     .data![index]
-                                              //                     .imgs,
-                                              //               );
-                                              //             });
-                                              //     if (response) {
-                                              //       Navigator.pushNamed(context,
-                                              //           "/contribution",
-                                              //           arguments: snapshot
-                                              //               .data![index].id);
-                                              //     }
-                                              //   },
-                                              //   child: Icon(
-                                              //     Icons.comment,
-                                              //     color: ThemeColors.grey,
-                                              //   ),
-                                              // ),
-                                            ],
-                                          )
-                                        : Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.how_to_vote,
-                                                    color: ThemeColors.grey,
-                                                  ),
-                                                  SizedBox(
-                                                    width:
-                                                        ThemePadding.padBase /
-                                                            2,
-                                                  ),
-                                                  Text(
-                                                    "${snapshot.data![index].contributions!.length}",
-                                                    style:
-                                                        ThemeTexTStyle.regular(
-                                                            color: ThemeColors
-                                                                .grey),
-                                                  )
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.share,
-                                                    color: ThemeColors.grey,
-                                                  ),
-                                                  SizedBox(
-                                                    width:
-                                                        ThemePadding.padBase /
-                                                            2,
-                                                  ),
-                                                  Text(
-                                                    "${snapshot.data![index].shares!}",
-                                                    style:
-                                                        ThemeTexTStyle.regular(
-                                                            color: ThemeColors
-                                                                .grey),
-                                                  )
-                                                ],
-                                              ),
-                                              InkWell(
-                                                onTap: () async {
-                                                  bool response =
-                                                      await showDialog(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return Contribute(
-                                                              images: snapshot
-                                                                  .data![index]
-                                                                  .imgs,
-                                                            );
-                                                          });
-                                                  if (response) {
-                                                    Navigator.pushNamed(context,
-                                                        "/contribution",
-                                                        arguments: snapshot
-                                                            .data![index].id);
-                                                  }
-                                                },
-                                                child: Icon(
-                                                  Icons.comment,
-                                                  color: ThemeColors.grey,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        : [
-                            Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ]),
+                    delegate: SliverChildListDelegate(
+
+                        snapshot.hasData && snapshot.data != null
+                            ? snapshot.data?.length==0?[Center(child: Text("No Posts To Show",style: ThemeTexTStyle.headerPrim,),)] :[
+                              StreamBuilder<bool>(
+                                initialData: false,
+                                stream: bloc.reloadStream,
+                                builder: (context, snapshot) {
+                                  return snapshot.data! ? LinearProgressIndicator(color: ThemeColors.primary,):SizedBox.shrink();
+                                }
+                              )
+                              ,...List.generate(
+                                snapshot.data!.length,
+                                (index) => PostCard(
+                                  authBloc: authBloc,
+                                  bloc: bloc,
+                                  post: snapshot.data![index],
+                                ),
+                              )]
+                            : [
+                                Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ]),
                   )
                 ],
               ),
             );
           }),
+    );
+  }
+}
+
+class PostCard extends StatefulWidget {
+  const PostCard({
+    Key? key,
+    required this.authBloc,
+    required this.bloc,
+    required this.post,
+  }) : super(key: key);
+
+  final AuthenticationBloc authBloc;
+  final DashboardBloc bloc;
+  final Post post;
+
+  @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  bool descContainerSize = false;
+
+  DashboardBloc dashboardBloc = sl<DashboardBloc>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(ThemePadding.padBase * 2.0),
+      margin: EdgeInsets.symmetric(vertical: ThemePadding.padBase),
+      decoration: BoxDecoration(
+        color: ThemeColors.white,
+        borderRadius: ThemeBorderRadius.smallRadiusAll,
+        boxShadow: ThemeDropShadow.smallShadow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Missing: ${widget.post.title}",
+                style: ThemeTexTStyle.titleTextStyleBlack,
+              ),
+              widget.post.userId == widget.authBloc.user?.id
+                  ? InkWell(
+                      onTap: () async {
+                        var res = await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Post Actions"),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      title: Text("Edit Post"),
+                                      onTap: () async {
+                                        bool res = await Navigator.push(context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                          return EditPost(
+                                            post: widget.post,
+                                          );
+                                        })) as bool;
+                                        if (res)
+                                          Navigator.of(context).pop(true);
+                                      },
+                                    ),
+                                    ListTile(
+                                      title: Text("Delete Post"),
+                                      onTap: () {
+                                        widget.bloc.deletePost(
+                                            widget.post.id!, context);
+                                      },
+                                    )
+                                  ],
+                                ),
+                              );
+                            });
+                        if (res) widget.bloc.getFeedBody();
+                      },
+                      child: Icon(
+                        Icons.more_vert,
+                        color: ThemeColors.grey,
+                      ))
+                  : SizedBox.shrink(),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  "Last Seen: ${DateFormat("dd, MMM").format(widget.post.lastSeen!.date ?? DateTime.now())} @ ${widget.post.lastSeen!.location}",
+                  style: ThemeTexTStyle.regular(),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(width: ThemePadding.padBase),
+              Text(DateFormat("dd, MMM")
+                  .format(widget.post.createdAt ?? DateTime.now()))
+            ],
+          ),
+          Text(
+            "Status: ${widget.post.status}",
+            style: ThemeTexTStyle.regular(color: ThemeColors.grey),
+          ),
+          SizedBox(
+            height: ThemePadding.padBase,
+          ),
+          ImagesLogic(
+            imgs: widget.post.imgs,
+          ),
+          SizedBox(
+            height: ThemePadding.padBase,
+          ),
+          Container(
+            // constraints: descContainerSize == null
+            //     ? null
+            //     : BoxConstraints(maxHeight: descContainerSize!),
+            child: Text(
+              widget.post.desc ?? "",
+              maxLines: descContainerSize ? null : 3,
+              overflow: descContainerSize ? null : TextOverflow.fade,
+              style: ThemeTexTStyle.regular(),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              setState(() {
+                descContainerSize = !descContainerSize;
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.all(5),
+              child: Text(
+                descContainerSize ? "Show Less" : "Read More",
+                style: ThemeTexTStyle.regular(color: ThemeColors.primary),
+              ),
+            ),
+          ),
+          Container(
+            // height: 50,
+            padding: EdgeInsets.all(ThemePadding.padBase),
+            child: widget.post.userId == widget.authBloc.user?.id
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.how_to_vote,
+                            color: ThemeColors.grey,
+                          ),
+                          SizedBox(
+                            width: ThemePadding.padBase / 2,
+                          ),
+                          Text(
+                            "${widget.post.contributions!.length}",
+                            style:
+                                ThemeTexTStyle.regular(color: ThemeColors.grey),
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.share,
+                            color: ThemeColors.grey,
+                          ),
+                          SizedBox(
+                            width: ThemePadding.padBase / 2,
+                          ),
+                          Text(
+                            "${widget.post.shares!}",
+                            style:
+                                ThemeTexTStyle.regular(color: ThemeColors.grey),
+                          )
+                        ],
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return ResultMapView();
+                          }));
+                        },
+                        child: Icon(
+                          Icons.list_alt,
+                          color: ThemeColors.grey,
+                        ),
+                      ),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.how_to_vote,
+                            color: ThemeColors.grey,
+                          ),
+                          SizedBox(
+                            width: ThemePadding.padBase / 2,
+                          ),
+                          Text(
+                            "${widget.post.contributions!.length}",
+                            style:
+                                ThemeTexTStyle.regular(color: ThemeColors.grey),
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.share,
+                            color: ThemeColors.grey,
+                          ),
+                          SizedBox(
+                            width: ThemePadding.padBase / 2,
+                          ),
+                          Text(
+                            "${widget.post.shares!}",
+                            style:
+                                ThemeTexTStyle.regular(color: ThemeColors.grey),
+                          )
+                        ],
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          bool response = await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Contribute(
+                                  images: widget.post.imgs,
+                                );
+                              });
+                          if (response) {
+                            OnPopModel? onPopModel=await Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return Contribution(
+                                postId: widget.post.id!,
+                              );
+                            }));
+                        if(onPopModel!=null && onPopModel.reloadPrev){
+                          dashboardBloc.getFeedBody();
+                        }
+                          }
+                        },
+                        child: Icon(
+                          Icons.comment,
+                          color: ThemeColors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+          )
+        ],
+      ),
     );
   }
 }

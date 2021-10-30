@@ -26,17 +26,7 @@ class HomeView extends StatelessWidget {
         ],
       )),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     pageController.jumpToPage(1);
-      //   },
-      //   backgroundColor: ThemeColors.primary,
-      //   isExtended: false,
-      //   child: Icon(
-      //     Icons.add,
-      //     color: Colors.white,
-      //   ),
-      // ),
+
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
         notchMargin: 5,

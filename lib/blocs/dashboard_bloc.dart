@@ -14,18 +14,22 @@ class DashboardBloc {
   Stream<List<Post>> get feedStream => feed.stream;
   Sink<List<Post>> get _feedSink => feed.sink;
 
+  StreamController<bool> reload = StreamController<bool>();
+  Stream<bool> get reloadStream => reload.stream;
+  Sink<bool> get reloadSink=> reload.sink;
+
   getFeedBody() async {
     if (currentData != null) {
+      reloadSink.add(true);
+    } 
       List response = await _api.getFeed();
 
       currentData = response.map((e) => Post.fromJson(e)).toList();
       _feedSink.add(currentData!.reversed.toList());
-    } else {
-      List response = await _api.getFeed();
-
-      currentData = response.map((e) => Post.fromJson(e)).toList();
-      _feedSink.add(currentData!.reversed.toList());
+       if (currentData != null) {
+      reloadSink.add(false);
     }
+    
   }
 
   deletePost(String postId, BuildContext context) async {

@@ -10,6 +10,7 @@ import 'package:project_android/themes/dropShadows.dart';
 import 'package:project_android/themes/padding.dart';
 import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
+import 'package:project_android/ui/signup_view.dart';
 
 class Login extends StatefulWidget {
   Login({Key? key}) : super(key: key);
@@ -108,9 +109,12 @@ class _LoginState extends State<Login> with InputDec {
                                                 ),
                                                 GestureDetector(
                                                   onTap: () {
-                                                    Navigator
-                                                        .pushReplacementNamed(
-                                                            context, '/signup');
+                                                    Navigator.pushReplacement(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    SignUp()));
                                                   },
                                                   child: Container(
                                                     padding: EdgeInsets.all(7),

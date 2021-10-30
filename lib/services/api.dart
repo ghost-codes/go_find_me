@@ -60,8 +60,8 @@ class Api {
         } catch (err) {
           print(err);
         }
-      }
       return handler.next(e);
+      }
     }));
   }
 

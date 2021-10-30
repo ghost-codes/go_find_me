@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:project_android/locator.dart';
+import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/services/api.dart';
 
 class ContributionBloc {
@@ -35,7 +36,7 @@ class ContributionBloc {
     });
 
     if (response != null) {
-      Navigator.pop(context);
+      Navigator.pop(context,OnPopModel(reloadPrev:true));
     }
   }
 }

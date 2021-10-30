@@ -9,6 +9,7 @@ import 'package:project_android/themes/dropShadows.dart';
 import 'package:project_android/themes/padding.dart';
 import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
+import 'package:project_android/ui/login_view.dart';
 
 class SignUp extends StatelessWidget with InputDec {
   SignUp({Key? key}) : super(key: key);
@@ -20,6 +21,7 @@ class SignUp extends StatelessWidget with InputDec {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffold,
+      backgroundColor: ThemeColors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -56,58 +58,105 @@ class SignUp extends StatelessWidget with InputDec {
                 ),
                 StreamBuilder<bool>(
                     initialData: false,
-                    stream: _authBloc.isAuthenticatingStream,
-                    builder: (context, snapshot) {
-                      return snapshot.data!
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: ThemeColors.primary,
-                              ),
-                            )
-                          : Container(
-                              // height: 620,
-                              padding:
-                                  EdgeInsets.all(2.5 * ThemePadding.padBase),
-                              decoration: BoxDecoration(
-                                color: ThemeColors.white,
-                                borderRadius: ThemeBorderRadius.bigRadiusAll,
-                                boxShadow: ThemeDropShadow.bigShadow,
-                              ),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: ThemePadding.padBase * 2,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Sign Up ",
-                                        style: ThemeTexTStyle.headerPrim,
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushReplacementNamed(
-                                              context, '/login');
-                                        },
-                                        child: Text(
-                                          "Login",
-                                          style: ThemeTexTStyle.regular(),
+                    stream: _authBloc.setGooglePasswordStream,
+                    builder: (context, setPass) {
+                      return StreamBuilder<bool>(
+                          initialData: false,
+                          stream: _authBloc.isAuthenticatingStream,
+                          builder: (context, snapshot) {
+                            return snapshot.data!
+                                ? Center(
+                                    child: CircularProgressIndicator(
+                                      color: ThemeColors.primary,
+                                    ),
+                                  )
+                                : Container(
+                                    // height: 620,
+                                    padding: EdgeInsets.all(
+                                        2.5 * ThemePadding.padBase),
+                                    decoration: BoxDecoration(
+                                      color: ThemeColors.white,
+                                      borderRadius:
+                                          ThemeBorderRadius.bigRadiusAll,
+                                      boxShadow: ThemeDropShadow.bigShadow,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          height: ThemePadding.padBase * 2,
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(height: 2.5 * ThemePadding.padBase),
-                                  signup()
-                                ],
-                              ),
-                            );
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Sign Up ",
+                                              style: ThemeTexTStyle.headerPrim,
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            Login()));
+                                              },
+                                              child: Text(
+                                                "Login",
+                                                style: ThemeTexTStyle.regular(),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        SizedBox(
+                                            height: 2.5 * ThemePadding.padBase),
+                                        setPass.data! ? setPassWord() : signup()
+                                      ],
+                                    ),
+                                  );
+                          });
                     }),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Form setPassWord() {
+    return Form(
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _authBloc.googleUsername,
+            decoration: inputDec(hint: "Username"),
+          ),
+          SizedBox(
+            height: 1.5 * ThemePadding.padBase,
+          ),
+          PasswordTextField(
+            controller: _authBloc.googlePassword,
+            inputDec: inputDec(hint: "Password"),
+          ),
+          SizedBox(height: 1.5 * ThemePadding.padBase),
+          TextFormField(
+            validator: (String? value) {
+              return _authBloc.passwordValidate(
+                  value, _authBloc.googlePassword);
+            },
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            decoration: inputDec(hint: "Confirm Password"),
+            obscureText: true,
+          ),
+          SizedBox(height: 50),
+          ThemeButton.longButtonPrim(
+            text: "Done",
+            onpressed: () {
+              _authBloc.googleSignUp(_scaffold.currentContext!);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -161,64 +210,9 @@ class SignUp extends StatelessWidget with InputDec {
           ThemeButton.longButtonSec(
             text: "Google",
             onpressed: () async {
-              await _authBloc.googleSignUp(_scaffold.currentContext!);
+              await _authBloc.googleSignIn(_scaffold.currentContext!);
             },
           )
-        ],
-      ),
-    );
-  }
-}
-
-class SignUpForm extends StatelessWidget with InputDec {
-  SignUpForm({Key? key}) : super(key: key);
-
-  AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      child: Column(
-        children: [
-          TextFormField(
-            decoration: inputDec(hint: "Name"),
-          ),
-          SizedBox(height: 2 * ThemePadding.padBase),
-          TextFormField(
-            decoration: inputDec(hint: "Email"),
-          ),
-          SizedBox(height: 2 * ThemePadding.padBase),
-          PasswordTextField(
-            inputDec: inputDec(hint: "Password"),
-            controller: TextEditingController(),
-          ),
-          SizedBox(height: 2 * ThemePadding.padBase),
-          TextFormField(
-            decoration: inputDec(hint: "Confirm Password"),
-            obscureText: true,
-          ),
-          SizedBox(height: 50),
-          ThemeButton.longButtonPrim(
-            text: "Sign Up",
-            onpressed: () {
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          ),
-          Divider(
-            height: ThemePadding.padBase * 3,
-          ),
-          Text(
-            "or",
-            style: ThemeTexTStyle.regular(),
-          ),
-          SizedBox(
-            height: ThemePadding.padBase,
-          ),
-          ThemeButton.longButtonSec(
-              text: "Google",
-              onpressed: () async {
-                await _authBloc.googleSignUp(context);
-              })
         ],
       ),
     );

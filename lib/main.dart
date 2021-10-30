@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/themes/theme_colors.dart';
-import 'package:project_android/ui/home_view.dart';
-import 'package:project_android/util/route_generator.dart';
+import 'package:project_android/ui/splash_view.dart';
 
 void main() {
   setuplocator();
@@ -19,8 +18,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: ThemeColors.primary,
       ),
-      initialRoute: "/splash",
-      onGenerateRoute: RouteGenerator.generateRoute,
+      home: SplashScreen(),
+      // initialRoute: "/",
+      // routes: {
+      //   "/": (context) => SplashScreen(),
+      //   "/login": (context) => Login()
+      // },
+      // onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }

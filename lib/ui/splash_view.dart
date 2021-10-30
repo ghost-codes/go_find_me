@@ -3,6 +3,7 @@ import 'package:project_android/blocs/authenticationBloc.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/themes/theme_colors.dart';
+import 'package:project_android/ui/login_view.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -14,20 +15,22 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   AuthenticationBloc _authenticationBloc = sl<AuthenticationBloc>();
 
-  @override
-  void initState() {
-    super.initState();
-
-    Future.delayed(Duration(milliseconds: 1500), () {
-      Navigator.pushReplacementNamed(context, "/login");
-    });
-  }
-
   // @override
   // void initState() {
   //   super.initState();
-  //   _authenticationBloc.tokenAuthentication(context);
+  //   print("object");
+
+  //   Future.delayed(Duration(milliseconds: 1500), () {
+  //     Navigator.pushReplacement(
+  //         context, MaterialPageRoute(builder: (context) => Login()));
+  //   });
   // }
+
+  @override
+  void initState() {
+    super.initState();
+    _authenticationBloc.tokenAuthentication(context);
+  }
 
   @override
   void dispose() {
