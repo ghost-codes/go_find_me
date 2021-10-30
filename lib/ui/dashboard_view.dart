@@ -68,12 +68,25 @@ class _DashboardViewState extends State<DashboardView> {
                   SliverList(
                     delegate: SliverChildListDelegate(
 
-                        snapshot.hasData && snapshot.data != null
-                            ? snapshot.data?.length==0?[Center(child: Text("No Posts To Show",style: ThemeTexTStyle.headerPrim,),)] :[
+                        snapshot.hasData && snapshot.data !=null
+                            ? snapshot.data?.length==0?[
                               StreamBuilder<bool>(
                                 initialData: false,
                                 stream: bloc.reloadStream,
                                 builder: (context, snapshot) {
+                         
+                                  return snapshot.data! ? LinearProgressIndicator(color: ThemeColors.primary,):SizedBox.shrink();
+                                }
+                              )
+                              ,
+                              Center(child: Text("No Posts To Show",style: ThemeTexTStyle.headerPrim,),),
+                             SizedBox(height:15),
+                              Center(child: ThemeButton.ButtonSec(text: "Retry",onpressed:(){bloc.getFeedBody();}))] :[
+                              StreamBuilder<bool>(
+                                initialData: false,
+                                stream: bloc.reloadStream,
+                                builder: (context, snapshot) {
+                                  print(snapshot.data);
                                   return snapshot.data! ? LinearProgressIndicator(color: ThemeColors.primary,):SizedBox.shrink();
                                 }
                               )

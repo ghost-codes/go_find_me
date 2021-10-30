@@ -21,6 +21,7 @@ class DashboardBloc {
   getFeedBody() async {
     if (currentData != null) {
       reloadSink.add(true);
+      print("Hello");
     } 
       List response = await _api.getFeed();
 
