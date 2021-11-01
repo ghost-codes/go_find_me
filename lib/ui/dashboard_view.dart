@@ -45,7 +45,6 @@ class _DashboardViewState extends State<DashboardView> {
       child: StreamBuilder<List<Post>>(
           stream: bloc.feedStream,
           builder: (context, snapshot) {
-           
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: CustomScrollView(
@@ -67,37 +66,54 @@ class _DashboardViewState extends State<DashboardView> {
                   ),
                   SliverList(
                     delegate: SliverChildListDelegate(
-
-                        snapshot.hasData && snapshot.data !=null
-                            ? snapshot.data?.length==0?[
-                              StreamBuilder<bool>(
-                                initialData: false,
-                                stream: bloc.reloadStream,
-                                builder: (context, snapshot) {
-                         
-                                  return snapshot.data! ? LinearProgressIndicator(color: ThemeColors.primary,):SizedBox.shrink();
-                                }
-                              )
-                              ,
-                              Center(child: Text("No Posts To Show",style: ThemeTexTStyle.headerPrim,),),
-                             SizedBox(height:15),
-                              Center(child: ThemeButton.ButtonSec(text: "Retry",onpressed:(){bloc.getFeedBody();}))] :[
-                              StreamBuilder<bool>(
-                                initialData: false,
-                                stream: bloc.reloadStream,
-                                builder: (context, snapshot) {
-                                  print(snapshot.data);
-                                  return snapshot.data! ? LinearProgressIndicator(color: ThemeColors.primary,):SizedBox.shrink();
-                                }
-                              )
-                              ,...List.generate(
-                                snapshot.data!.length,
-                                (index) => PostCard(
-                                  authBloc: authBloc,
-                                  bloc: bloc,
-                                  post: snapshot.data![index],
-                                ),
-                              )]
+                        snapshot.hasData && snapshot.data != null
+                            ? snapshot.data?.length == 0
+                                ? [
+                                    StreamBuilder<bool>(
+                                        initialData: false,
+                                        stream: bloc.reloadStream,
+                                        builder: (context, snapshot) {
+                                          return snapshot.data!
+                                              ? LinearProgressIndicator(
+                                                  color: ThemeColors.primary,
+                                                )
+                                              : SizedBox.shrink();
+                                        }),
+                                    Center(
+                                      child: Text(
+                                        "No Posts To Show",
+                                        style: ThemeTexTStyle.headerPrim,
+                                      ),
+                                    ),
+                                    SizedBox(height: 15),
+                                    Center(
+                                        child: ThemeButton.ButtonSec(
+                                            text: "Retry",
+                                            onpressed: () {
+                                              bloc.getFeedBody();
+                                            }))
+                                  ]
+                                : [
+                                    StreamBuilder<bool>(
+                                        initialData: false,
+                                        stream: bloc.reloadStream,
+                                        builder: (context, snapshot) {
+                                          print(snapshot.data);
+                                          return snapshot.data!
+                                              ? LinearProgressIndicator(
+                                                  color: ThemeColors.primary,
+                                                )
+                                              : SizedBox.shrink();
+                                        }),
+                                    ...List.generate(
+                                      snapshot.data!.length,
+                                      (index) => PostCard(
+                                        authBloc: authBloc,
+                                        bloc: bloc,
+                                        post: snapshot.data![index],
+                                      ),
+                                    )
+                                  ]
                             : [
                                 Center(
                                   child: CircularProgressIndicator(),
@@ -213,9 +229,28 @@ class _PostCardState extends State<PostCard> {
                   .format(widget.post.createdAt ?? DateTime.now()))
             ],
           ),
-          Text(
-            "Status: ${widget.post.status}",
-            style: ThemeTexTStyle.regular(color: ThemeColors.grey),
+          Row(
+            children: [
+              Text(
+                "Status: ",
+                style: ThemeTexTStyle.regular(color: ThemeColors.grey),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: widget.post.status == "Not Found"
+                      ? ThemeColors.accent
+                      : ThemeColors.green,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: EdgeInsets.symmetric(
+                    vertical: ThemePadding.padBase / 4,
+                    horizontal: ThemePadding.padBase),
+                child: Text(
+                  widget.post.status!,
+                  style: ThemeTexTStyle.regular(color: ThemeColors.white),
+                ),
+              )
+            ],
           ),
           SizedBox(
             height: ThemePadding.padBase,
@@ -349,15 +384,15 @@ class _PostCardState extends State<PostCard> {
                                 );
                               });
                           if (response) {
-                            OnPopModel? onPopModel=await Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
+                            OnPopModel? onPopModel = await Navigator.push(
+                                context, MaterialPageRoute(builder: (context) {
                               return Contribution(
                                 postId: widget.post.id!,
                               );
                             }));
-                        if(onPopModel!=null && onPopModel.reloadPrev){
-                          dashboardBloc.getFeedBody();
-                        }
+                            if (onPopModel != null && onPopModel.reloadPrev) {
+                              dashboardBloc.getFeedBody();
+                            }
                           }
                         },
                         child: Icon(
