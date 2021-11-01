@@ -7,11 +7,15 @@ import 'package:uuid/uuid.dart';
 
 class LocationTextField extends StatefulWidget {
   const LocationTextField(
-      {Key? key, @required this.hintText = '', @required this.controller})
+      {Key? key,
+      @required this.hintText = '',
+      @required this.controller,
+      @required this.validator})
       : super(key: key);
 
   final String hintText;
   final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   @override
   _LocationTextFieldState createState() => _LocationTextFieldState();
@@ -21,9 +25,7 @@ class _LocationTextFieldState extends State<LocationTextField> {
   final FocusNode _focusNode = FocusNode();
 
   PlacesService _placesService = sl<PlacesService>();
-
   late OverlayEntry _overlayEntry;
-
   final LayerLink _layerLink = LayerLink();
 
   List<Suggestion> displayData = [];
@@ -91,6 +93,7 @@ class _LocationTextFieldState extends State<LocationTextField> {
     return CompositedTransformTarget(
       link: this._layerLink,
       child: TextFormField(
+        validator: widget.validator,
         controller: widget.controller,
         focusNode: this._focusNode,
         onTap: () {

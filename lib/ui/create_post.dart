@@ -64,7 +64,9 @@ class _CreatePostViewState extends State<CreatePostView> {
                               key: createPostProv.formKey,
                               child: Column(
                                 children: [
-                                  TextField(
+                                  TextFormField(
+                                    validator: (String? value) => createPostProv
+                                        .isEmptyValidator(value!, "Title"),
                                     controller: createPostProv.title,
                                     maxLines: 1,
                                     decoration: InputDecoration(
@@ -261,11 +263,17 @@ class _CreatePostViewState extends State<CreatePostView> {
                                   ),
                                   SizedBox(height: 10),
                                   LocationTextField(
+                                    validator: (String? value) =>
+                                        createPostProv.isEmptyValidator(
+                                            value!, "Last Seen Location"),
                                     hintText: "Last Seen Location",
                                     controller: createPostProv.lastSeenLocation,
                                   ),
                                   SizedBox(height: 10),
-                                  TextField(
+                                  TextFormField(
+                                    validator: (value) =>
+                                        createPostProv.isEmptyValidator(
+                                            value!, "Description"),
                                     controller: createPostProv.postDescription,
                                     maxLines: 5,
                                     decoration: InputDecoration(

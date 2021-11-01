@@ -11,6 +11,7 @@ import 'package:project_android/locator.dart';
 import 'package:project_android/models/PostModel.dart';
 import 'package:project_android/modules/base_provider.dart';
 import 'package:project_android/services/api.dart';
+import 'package:project_android/util/validators.dart';
 
 enum CreatePostEventState { idle, loading, error, success }
 
@@ -28,7 +29,7 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
 
   HomeBloc homeBloc = sl<HomeBloc>();
   DashboardBloc dashboardBloc = sl<DashboardBloc>();
-  List<XFile>? _images;
+  List<XFile>? _images = [];
   List<Uint8List> memImages = [];
 
   // Form Key
@@ -45,37 +46,51 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
   DateTime? _lastSeenDate = DateTime.now();
   DateTime? get lastSeenDate => _lastSeenDate;
 
-  onCreatePost(BuildContext context) async {
-    addEvent(CreatePostEvent(state: CreatePostEventState.loading));
-    List<MultipartFile> files = [];
-    _images?.forEach((element) async {
-      files.add(MultipartFile.fromFileSync(element.path));
-    });
-
-    Post? response = await _api.createPost({
-      "userId": _authBloc.user?.id,
-      "desc": postDescription.text,
-      "title": title.text,
-      "uploads": files,
-      "last_seen": {
-        "location": lastSeenLocation.text,
-        "date": _lastSeenDate!.toIso8601String()
-      }
-    }).onError((error, stackTrace) {
-      addEvent(CreatePostEvent(
-          state: CreatePostEventState.error, data: error.toString()));
-
-      Dialogs.errorDialog(context, error.toString());
-    });
-
-    if (response != null) {
-      dashboardBloc.getFeedBody();
-      addEvent(CreatePostEvent(state: CreatePostEventState.success));
-      Navigator.pop(context, response);
+  String? isEmptyValidator(String value, String Fieldname) {
+    if (Validators.stringLengthValidator(value)) {
+      return "Please enter value for $Fieldname field";
     }
-    addEvent(CreatePostEvent(
-        state: CreatePostEventState.error,
-        data: "Error occured please try again."));
+
+    return null;
+  }
+
+  onCreatePost(BuildContext context) async {
+    if (_images!.length >= 2) {
+      if (_formKey.currentState!.validate()) {
+        addEvent(CreatePostEvent(state: CreatePostEventState.loading));
+        List<MultipartFile> files = [];
+        _images?.forEach((element) async {
+          files.add(MultipartFile.fromFileSync(element.path));
+        });
+
+        Post? response = await _api.createPost({
+          "userId": _authBloc.user?.id,
+          "desc": postDescription.text,
+          "title": title.text,
+          "uploads": files,
+          "last_seen": {
+            "location": lastSeenLocation.text,
+            "date": _lastSeenDate!.toIso8601String()
+          }
+        }).onError((error, stackTrace) {
+          addEvent(CreatePostEvent(
+              state: CreatePostEventState.error, data: error.toString()));
+
+          Dialogs.errorDialog(context, error.toString());
+        });
+
+        if (response != null) {
+          dashboardBloc.getFeedBody();
+          addEvent(CreatePostEvent(state: CreatePostEventState.success));
+          Navigator.pop(context, response);
+        }
+        addEvent(CreatePostEvent(
+            state: CreatePostEventState.error,
+            data: "Error occured please try again."));
+      }
+    } else {
+      Dialogs.errorDialog(context, "Please add 2 or more images");
+    }
   }
 
   onImageUpload() async {
