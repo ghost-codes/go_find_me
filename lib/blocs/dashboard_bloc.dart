@@ -14,14 +14,13 @@ class DashboardBloc {
   Stream<List<Post>> get feedStream => feed.stream;
   Sink<List<Post>> get _feedSink => feed.sink;
 
-  StreamController<bool> reload = StreamController<bool>();
+  StreamController<bool> reload = StreamController<bool>.broadcast( );
   Stream<bool> get reloadStream => reload.stream;
   Sink<bool> get reloadSink=> reload.sink;
 
   getFeedBody() async {
     if (currentData != null) {
       reloadSink.add(true);
-      print("Hello");
     } 
       List response = await _api.getFeed();
 

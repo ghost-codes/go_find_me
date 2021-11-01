@@ -17,61 +17,64 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: PageView(
-        controller: pageController,
-        children: [
+          child:
           DashboardView(),
-          CreatePostView(pageController: pageController),
-          ProfileView(),
-        ],
-      )),
+        
+      ),
+      floatingActionButton: FloatingActionButton(focusColor: ThemeColors.primary,
+      child: Icon(Icons.add),
+      onPressed: (){
+        Navigator.push(context, MaterialPageRoute(builder:(context)=>CreatePostView() ));
+      },
+      ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      bottomNavigationBar: BottomAppBar(
-        shape: CircularNotchedRectangle(),
-        notchMargin: 5,
-        color: Colors.white,
-        elevation: 10,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 50),
-          height: 50,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {
-                  pageController.jumpToPage(0);
-                },
-                icon: Icon(Icons.home),
-                color: Colors.black,
-              ),
-              InkWell(
-                onTap: () {
-                  pageController.jumpToPage(1);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: ThemeColors.primary,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  padding: EdgeInsets.all(7),
-                  child: Icon(
-                    Icons.add,
-                    color: ThemeColors.white,
-                  ),
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  pageController.jumpToPage(2);
-                },
-                icon: Icon(Icons.settings),
-                color: Colors.black,
-              )
-            ],
-          ),
-        ),
-      ),
+      // bottomNavigationBar: BottomAppBar(
+      //   shape: CircularNotchedRectangle(),
+      //   notchMargin: 5,
+      //   color: Colors.white,
+      //   elevation: 10,
+      //   child: Container(
+      //     padding: EdgeInsets.symmetric(horizontal: 50),
+      //     height: 50,
+      //     child: Row(
+      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //       children: [
+      //         IconButton(
+      //           onPressed: () {
+      //             pageController.jumpToPage(0);
+      //           },
+      //           icon: Icon(Icons.home),
+      //           color: Colors.black,
+      //         ),
+      //         InkWell(
+      //           onTap: () {
+      //             pageController.jumpToPage(1);
+      //           },
+      //           child: Container(
+      //             decoration: BoxDecoration(
+      //               color: ThemeColors.primary,
+      //               borderRadius: BorderRadius.circular(3),
+      //             ),
+      //             padding: EdgeInsets.all(7),
+      //             child: Icon(
+      //               Icons.add,
+      //               color: ThemeColors.white,
+      //             ),
+      //           ),
+      //         ),
+      //         IconButton(
+      //           onPressed: () {
+      //             pageController.jumpToPage(2);
+      //           },
+      //           icon: Icon(Icons.settings),
+      //           color: Colors.black,
+      //         )
+      //       ],
+      //     ),
+      //   ),
+      // ),
+    
     );
   }
 }

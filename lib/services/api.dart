@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_android/locator.dart';
+import 'package:project_android/models/PostModel.dart';
 import 'package:project_android/models/UserModel.dart';
 import 'package:project_android/services/sharedPref.dart';
 
@@ -60,7 +61,7 @@ class Api {
         } catch (err) {
           print(err);
         }
-      return handler.next(e);
+        return handler.next(e);
       }
     }));
   }
@@ -165,21 +166,20 @@ class Api {
 
   ///////////////////////////////////////////////////////
 
-  createPost(Map<String, dynamic> map) async {
+  Future<Post?> createPost(Map<String, dynamic> map) async {
     try {
       print(map);
       final formdata = FormData.fromMap(map);
 
       var response = await dio.post('/posts/', data: formdata);
       if (response.statusCode == 200) {
-        print(json.encode(response.data));
-        return response.data;
+        ;
+        return Post.fromJson(response.data);
       } else {
-        return null;
+        return Future.error("Unexpected error occured try again");
       }
     } catch (e) {
-      print(e);
-      return null;
+      return Future.error("Unexpected error occured try again");
     }
   }
 

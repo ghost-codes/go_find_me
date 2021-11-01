@@ -21,7 +21,6 @@ class CreatePostBloc {
   HomeBloc homeBloc = sl<HomeBloc>();
   DashboardBloc dashboardBloc = sl<DashboardBloc>();
   List<XFile>? _images;
-  PageController pageController = PageController();
 
   TextEditingController postDescription = TextEditingController();
   TextEditingController lastSeenLocation = TextEditingController();
@@ -58,7 +57,7 @@ class CreatePostBloc {
     pageState.close();
   }
 
-  onCreatePost() async {
+  onCreatePost(BuildContext context) async {
     pageStateSink.add(true);
     List<MultipartFile> files = [];
     _images?.forEach((element) async {
@@ -77,11 +76,9 @@ class CreatePostBloc {
     });
 
     if (response != null) {
-      print(response);
       dashboardBloc.getFeedBody();
-      pageController.jumpToPage(0);
-
       pageStateSink.add(false);
+      Navigator.pop(context);
     }
     pageStateSink.add(false);
   }
@@ -123,7 +120,7 @@ class CreatePostBloc {
     _createPostActionsStream.listen((CreatePostActions action) {
       switch (action) {
         case CreatePostActions.CreatePost:
-          onCreatePost();
+          // onCreatePost();
           break;
         default:
       }
