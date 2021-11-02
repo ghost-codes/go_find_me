@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthenticationResponse, UserReponseModel } from './auth.interface';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/global/user.schema';
 import { SignUpDTO } from './dto/signUp.dto';
 import { JwtService } from '@nestjs/jwt';
+import { LoginEmailDTO } from './dto/login.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +34,8 @@ export class AuthService {
     const userResponse: UserReponseModel = savedUser;
 
     const access_token = await this.generateAccessToken(savedUser);
+    const refresh_token = await this.generateRefreshToken(savedUser);
+
     const response: AuthenticationResponse = {
       user: {
         username: userResponse.username,
@@ -39,18 +43,51 @@ export class AuthService {
         id: userResponse.id,
       },
       accessToken: access_token.access_token,
-      refreshToken: '',
+      refreshToken: refresh_token.refresh_token,
     };
     console.log(response);
     return response;
   }
 
-  // async
+  async emailLogin(loginDTO: LoginEmailDTO): Promise<any> {
+    const user: User = await this.userModel.findOne({
+      $or: [{ username: loginDTO.identity }, { email: loginDTO.identity }],
+    });
 
-  async generateAccessToken(user: UserDocument) {
+    if (!user) throw new UnauthorizedException('Invalid email or password');
+    if (!(await this.bcryptCompare(loginDTO.password, user.password)))
+      throw new UnauthorizedException('Invalid email or password');
+
+    const accessToken = await this.generateAccessToken(user);
+    const refreshToken = await this.generateRefreshToken(user);
+    const response: AuthenticationResponse = {
+      user: {
+        username: user.username,
+        email: user.email,
+        id: user.id,
+      },
+      accessToken: accessToken.access_token,
+      refreshToken: refreshToken.refresh_token,
+    };
+    console.log(response);
+    return response;
+  }
+
+  async bcryptCompare(passwordString: string, hash: string): Promise<boolean> {
+    return await bcrypt.compare(passwordString, hash);
+  }
+
+  async generateAccessToken(user: User) {
     const payload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async generateRefreshToken(user: User) {
+    const payload = { username: user.username, sub: user.id };
+    return {
+      refresh_token: this.jwtService.sign(payload, { expiresIn: '500d' }),
     };
   }
 }
