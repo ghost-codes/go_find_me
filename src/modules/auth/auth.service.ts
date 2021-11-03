@@ -1,10 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthenticationResponse, UserReponseModel } from './auth.interface';
+import {
+  AuthenticationResponse,
+  UserReponseModel,
+} from './interfaces/auth.interface';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/global/user.schema';
 import { SignUpDTO } from './dto/signUp.dto';
 import { JwtService } from '@nestjs/jwt';
+import { UserSession } from './interfaces/userSession.interface';
 import { LoginEmailDTO } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -73,11 +77,30 @@ export class AuthService {
     return response;
   }
 
+  async refreshAccessToken(refreshToken: string): Promise<UserSession> {
+    const payload = this.validateToken(refreshToken);
+    if (!payload) throw new UnauthorizedException('Unathorized credentials');
+    const accessToken = await this.generateAccessToken(payload);
+    const userSession: UserSession = {
+      accessToken: accessToken.access_token,
+      refreshToken: refreshToken,
+    };
+    return userSession;
+  }
+
+  async validateToken(token: string) {
+    try {
+      const result = this.jwtService.verifyAsync(token);
+      return result;
+    } catch (e) {}
+    return null;
+  }
+
   async bcryptCompare(passwordString: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(passwordString, hash);
   }
 
-  async generateAccessToken(user: User) {
+  async generateAccessToken(user: any) {
     const payload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
