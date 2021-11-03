@@ -43,6 +43,7 @@ class _CreatePostViewState extends State<CreatePostView> {
     return ChangeNotifierProvider(
       create: (context) => CreatePostProvider(),
       child: Scaffold(
+        backgroundColor: ThemeColors.white,
         body:
             Consumer<CreatePostProvider>(builder: (context, createPostProv, _) {
           return SafeArea(

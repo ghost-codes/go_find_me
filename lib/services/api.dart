@@ -173,7 +173,6 @@ class Api {
 
       var response = await dio.post('/posts/', data: formdata);
       if (response.statusCode == 200) {
-        ;
         return Post.fromJson(response.data);
       } else {
         return Future.error("Unexpected error occured try again");
@@ -224,14 +223,20 @@ class Api {
     }
   }
 
-  Future<List<dynamic>> getFeed() async {
-    Response response = await dio.get("/posts/");
+  Future<List<Post?>> getFeed() async {
+    try {
+      Response response = await dio.get("/posts/");
 
-    if (response.statusCode == 200) {
-      print(response.data);
-      return response.data;
-    } else {
-      return [];
+      if (response.statusCode! >= 200 && response.statusCode! <= 300) {
+        List resultData = response.data;
+        List<Post?> posts = resultData.map((e) => Post.fromJson(e)).toList();
+        return posts;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print(e);
+      return Future.error("Unexpected Error");
     }
   }
 }

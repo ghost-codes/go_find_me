@@ -11,6 +11,7 @@ import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/models/PostModel.dart';
+import 'package:project_android/modules/post/dashboard_provider.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/themes/dropShadows.dart';
 import 'package:project_android/themes/padding.dart';
@@ -20,6 +21,7 @@ import 'package:intl/intl.dart';
 import 'package:project_android/ui/contribution.dart';
 import 'package:project_android/ui/editPost.dart';
 import 'package:project_android/ui/result_map_view.dart';
+import 'package:provider/provider.dart';
 
 class DashboardView extends StatefulWidget {
   DashboardView({Key? key}) : super(key: key);
@@ -29,101 +31,98 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-  DashboardBloc bloc = sl<DashboardBloc>();
   HomeBloc homeBloc = sl<HomeBloc>();
   AuthenticationBloc authBloc = sl<AuthenticationBloc>();
 
   @override
   void initState() {
-    bloc.getFeedBody();
+    // Provider.of<DashboardProvider>(context, listen: false).getFeedBody();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: StreamBuilder<List<Post>>(
-          stream: bloc.feedStream,
-          builder: (context, snapshot) {
-            return Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: CustomScrollView(
-                clipBehavior: Clip.none,
-                slivers: [
-                  SliverAppBar(
-                    floating: true,
-                    title: AppBarWidget(),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
-                      ),
+    return ChangeNotifierProvider(
+      create: (context) => DashboardProvider(),
+      child: SafeArea(
+        child:
+            Consumer<DashboardProvider>(builder: (context, dashboardProv, _) {
+          return Container(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: CustomScrollView(
+              clipBehavior: Clip.none,
+              slivers: [
+                SliverAppBar(
+                  floating: true,
+                  title: AppBarWidget(),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
                     ),
-                    automaticallyImplyLeading: false,
-                    elevation: 20,
-                    shadowColor: ThemeColors.black,
-                    backgroundColor: ThemeColors.white,
                   ),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                        snapshot.hasData && snapshot.data != null
-                            ? snapshot.data?.length == 0
-                                ? [
-                                    StreamBuilder<bool>(
-                                        initialData: false,
-                                        stream: bloc.reloadStream,
-                                        builder: (context, snapshot) {
-                                          return snapshot.data!
-                                              ? LinearProgressIndicator(
-                                                  color: ThemeColors.primary,
-                                                )
-                                              : SizedBox.shrink();
-                                        }),
-                                    Center(
-                                      child: Text(
-                                        "No Posts To Show",
-                                        style: ThemeTexTStyle.headerPrim,
-                                      ),
+                  automaticallyImplyLeading: false,
+                  elevation: 20,
+                  shadowColor: ThemeColors.black,
+                  backgroundColor: ThemeColors.white,
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                      dashboardProv.lastEvent?.state !=
+                                  DashBoardEventState.isloading &&
+                              (dashboardProv.currentData?.length != 0 ||
+                                  dashboardProv.currentData != null)
+                          ? dashboardProv.currentData?.length == 0 ||
+                                  dashboardProv.currentData == null
+                              ? [
+                                  // StreamBuilder<bool>(
+                                  //     initialData: false,
+                                  //     stream: bloc.reloadStream,
+                                  //     builder: (context, snapshot) {
+                                  //       return snapshot.data!
+                                  //           ? LinearProgressIndicator(
+                                  //               color: ThemeColors.primary,
+                                  //             )
+                                  //           : SizedBox.shrink();
+                                  //     }),
+                                  Center(
+                                    child: Text(
+                                      "No Posts To Show",
+                                      style: ThemeTexTStyle.headerPrim,
                                     ),
-                                    SizedBox(height: 15),
-                                    Center(
-                                        child: ThemeButton.ButtonSec(
-                                            text: "Retry",
-                                            onpressed: () {
-                                              bloc.getFeedBody();
-                                            }))
-                                  ]
-                                : [
-                                    StreamBuilder<bool>(
-                                        initialData: false,
-                                        stream: bloc.reloadStream,
-                                        builder: (context, snapshot) {
-                                          print(snapshot.data);
-                                          return snapshot.data!
-                                              ? LinearProgressIndicator(
-                                                  color: ThemeColors.primary,
-                                                )
-                                              : SizedBox.shrink();
-                                        }),
-                                    ...List.generate(
-                                      snapshot.data!.length,
-                                      (index) => PostCard(
-                                        authBloc: authBloc,
-                                        bloc: bloc,
-                                        post: snapshot.data![index],
-                                      ),
-                                    )
-                                  ]
-                            : [
-                                Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              ]),
-                  )
-                ],
-              ),
-            );
-          }),
+                                  ),
+                                  SizedBox(height: 15),
+                                  Center(
+                                      child: ThemeButton.ButtonSec(
+                                          text: "Retry",
+                                          onpressed: () {
+                                            dashboardProv.getFeedBody();
+                                          }))
+                                ]
+                              : [
+                                  dashboardProv.lastEvent?.state ==
+                                          DashBoardEventState.isloading
+                                      ? LinearProgressIndicator()
+                                      : SizedBox(),
+                                  ...List.generate(
+                                    dashboardProv.currentData!.length,
+                                    (index) => PostCard(
+                                      authBloc: authBloc,
+                                      post: dashboardProv.currentData![index]!,
+                                    ),
+                                  )
+                                ]
+                          : [
+                              Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ]),
+                )
+              ],
+            ),
+          );
+        }),
+      ),
     );
   }
 }
@@ -132,12 +131,11 @@ class PostCard extends StatefulWidget {
   const PostCard({
     Key? key,
     required this.authBloc,
-    required this.bloc,
     required this.post,
   }) : super(key: key);
 
   final AuthenticationBloc authBloc;
-  final DashboardBloc bloc;
+
   final Post post;
 
   @override
@@ -151,261 +149,275 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(ThemePadding.padBase * 2.0),
-      margin: EdgeInsets.symmetric(vertical: ThemePadding.padBase),
-      decoration: BoxDecoration(
-        color: ThemeColors.white,
-        borderRadius: ThemeBorderRadius.smallRadiusAll,
-        boxShadow: ThemeDropShadow.smallShadow,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Missing: ${widget.post.title}",
-                style: ThemeTexTStyle.titleTextStyleBlack,
-              ),
-              widget.post.userId == widget.authBloc.user?.id
-                  ? InkWell(
-                      onTap: () async {
-                        var res = await showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text("Post Actions"),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      title: Text("Edit Post"),
-                                      onTap: () async {
-                                        bool res = await Navigator.push(context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                          return EditPost(
-                                            post: widget.post,
-                                          );
-                                        })) as bool;
-                                        if (res)
-                                          Navigator.of(context).pop(true);
-                                      },
-                                    ),
-                                    ListTile(
-                                      title: Text("Delete Post"),
-                                      onTap: () {
-                                        widget.bloc.deletePost(
-                                            widget.post.id!, context);
-                                      },
-                                    )
-                                  ],
-                                ),
-                              );
-                            });
-                        if (res) widget.bloc.getFeedBody();
-                      },
-                      child: Icon(
-                        Icons.more_vert,
-                        color: ThemeColors.grey,
-                      ))
-                  : SizedBox.shrink(),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  "Last Seen: ${DateFormat("dd, MMM").format(widget.post.lastSeen!.date ?? DateTime.now())} @ ${widget.post.lastSeen!.location}",
-                  style: ThemeTexTStyle.regular(),
-                  overflow: TextOverflow.ellipsis,
+    return Consumer<DashboardProvider>(builder: (context, dashboardProv, _) {
+      return Container(
+        padding: EdgeInsets.all(ThemePadding.padBase * 2.0),
+        margin: EdgeInsets.symmetric(vertical: ThemePadding.padBase),
+        decoration: BoxDecoration(
+          color: ThemeColors.white,
+          borderRadius: ThemeBorderRadius.smallRadiusAll,
+          boxShadow: ThemeDropShadow.smallShadow,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Missing: ${widget.post.title}",
+                  style: ThemeTexTStyle.titleTextStyleBlack,
                 ),
-              ),
-              SizedBox(width: ThemePadding.padBase),
-              Text(DateFormat("dd, MMM")
-                  .format(widget.post.createdAt ?? DateTime.now()))
-            ],
-          ),
-          Row(
-            children: [
-              Text(
-                "Status: ",
-                style: ThemeTexTStyle.regular(color: ThemeColors.grey),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: widget.post.status == "Not Found"
-                      ? ThemeColors.accent
-                      : ThemeColors.green,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.symmetric(
-                    vertical: ThemePadding.padBase / 4,
-                    horizontal: ThemePadding.padBase),
-                child: Text(
-                  widget.post.status!,
-                  style: ThemeTexTStyle.regular(color: ThemeColors.white),
-                ),
-              )
-            ],
-          ),
-          SizedBox(
-            height: ThemePadding.padBase,
-          ),
-          ImagesLogic(
-            imgs: widget.post.imgs,
-          ),
-          SizedBox(
-            height: ThemePadding.padBase,
-          ),
-          Container(
-            // constraints: descContainerSize == null
-            //     ? null
-            //     : BoxConstraints(maxHeight: descContainerSize!),
-            child: Text(
-              widget.post.desc ?? "",
-              maxLines: descContainerSize ? null : 3,
-              overflow: descContainerSize ? null : TextOverflow.fade,
-              style: ThemeTexTStyle.regular(),
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              setState(() {
-                descContainerSize = !descContainerSize;
-              });
-            },
-            child: Container(
-              padding: EdgeInsets.all(5),
-              child: Text(
-                descContainerSize ? "Show Less" : "Read More",
-                style: ThemeTexTStyle.regular(color: ThemeColors.primary),
-              ),
-            ),
-          ),
-          Container(
-            // height: 50,
-            padding: EdgeInsets.all(ThemePadding.padBase),
-            child: widget.post.userId == widget.authBloc.user?.id
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.how_to_vote,
-                            color: ThemeColors.grey,
-                          ),
-                          SizedBox(
-                            width: ThemePadding.padBase / 2,
-                          ),
-                          Text(
-                            "${widget.post.contributions!.length}",
-                            style:
-                                ThemeTexTStyle.regular(color: ThemeColors.grey),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.share,
-                            color: ThemeColors.grey,
-                          ),
-                          SizedBox(
-                            width: ThemePadding.padBase / 2,
-                          ),
-                          Text(
-                            "${widget.post.shares!}",
-                            style:
-                                ThemeTexTStyle.regular(color: ThemeColors.grey),
-                          )
-                        ],
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return ResultMapView();
-                          }));
-                        },
-                        child: Icon(
-                          Icons.list_alt,
-                          color: ThemeColors.grey,
-                        ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.how_to_vote,
-                            color: ThemeColors.grey,
-                          ),
-                          SizedBox(
-                            width: ThemePadding.padBase / 2,
-                          ),
-                          Text(
-                            "${widget.post.contributions!.length}",
-                            style:
-                                ThemeTexTStyle.regular(color: ThemeColors.grey),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.share,
-                            color: ThemeColors.grey,
-                          ),
-                          SizedBox(
-                            width: ThemePadding.padBase / 2,
-                          ),
-                          Text(
-                            "${widget.post.shares!}",
-                            style:
-                                ThemeTexTStyle.regular(color: ThemeColors.grey),
-                          )
-                        ],
-                      ),
-                      InkWell(
+                widget.post.userId == widget.authBloc.user?.id
+                    ? InkWell(
                         onTap: () async {
-                          bool response = await showDialog(
+                          var res = await showDialog(
                               context: context,
                               builder: (context) {
-                                return Contribute(
-                                  images: widget.post.imgs,
+                                return AlertDialog(
+                                  title: Text("Post Actions"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ListTile(
+                                        title: Text("Edit Post"),
+                                        onTap: () async {
+                                          bool res = await Navigator.push(
+                                              context, MaterialPageRoute(
+                                                  builder: (context) {
+                                            return EditPost(
+                                              post: widget.post,
+                                            );
+                                          })) as bool;
+                                          if (res)
+                                            Navigator.of(context).pop(true);
+                                        },
+                                      ),
+                                      ListTile(
+                                        title: Text("Delete Post"),
+                                        onTap: () {
+                                          dashboardProv.deletePost(
+                                              widget.post.id!, context);
+                                        },
+                                      )
+                                    ],
+                                  ),
                                 );
                               });
-                          if (response) {
-                            OnPopModel? onPopModel = await Navigator.push(
-                                context, MaterialPageRoute(builder: (context) {
-                              return Contribution(
-                                postId: widget.post.id!,
-                              );
-                            }));
-                            if (onPopModel != null && onPopModel.reloadPrev) {
-                              dashboardBloc.getFeedBody();
-                            }
-                          }
+                          // if (res) dash.getFeedBody();
                         },
                         child: Icon(
-                          Icons.comment,
+                          Icons.more_vert,
                           color: ThemeColors.grey,
-                        ),
-                      ),
-                    ],
+                        ))
+                    : SizedBox.shrink(),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    "Last Seen: ${DateFormat("dd, MMM y").format(widget.post.lastSeen!.date ?? DateTime.now())}",
+                    style: ThemeTexTStyle.regular(),
+                    overflow: TextOverflow.ellipsis,
                   ),
-          )
-        ],
-      ),
-    );
+                ),
+                SizedBox(width: ThemePadding.padBase),
+                Text(DateFormat("dd, MMM")
+                    .format(widget.post.createdAt ?? DateTime.now()))
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    "@ ${widget.post.lastSeen!.location}",
+                    style: ThemeTexTStyle.regular(),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Text(
+                  "Status: ",
+                  style: ThemeTexTStyle.regular(color: ThemeColors.grey),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: widget.post.status == "Not Found"
+                        ? ThemeColors.accent
+                        : ThemeColors.green,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                      vertical: ThemePadding.padBase / 4,
+                      horizontal: ThemePadding.padBase),
+                  child: Text(
+                    widget.post.status!,
+                    style: ThemeTexTStyle.regular(color: ThemeColors.white),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: ThemePadding.padBase,
+            ),
+            ImagesLogic(
+              imgs: widget.post.imgs,
+            ),
+            SizedBox(
+              height: ThemePadding.padBase,
+            ),
+            Container(
+              // constraints: descContainerSize == null
+              //     ? null
+              //     : BoxConstraints(maxHeight: descContainerSize!),
+              child: Text(
+                widget.post.desc ?? "",
+                maxLines: descContainerSize ? null : 3,
+                overflow: descContainerSize ? null : TextOverflow.fade,
+                style: ThemeTexTStyle.regular(),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  descContainerSize = !descContainerSize;
+                });
+              },
+              child: Container(
+                padding: EdgeInsets.all(5),
+                child: Text(
+                  descContainerSize ? "Show Less" : "Read More",
+                  style: ThemeTexTStyle.regular(color: ThemeColors.primary),
+                ),
+              ),
+            ),
+            Container(
+              // height: 50,
+              padding: EdgeInsets.all(ThemePadding.padBase),
+              child: widget.post.userId == widget.authBloc.user?.id
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.how_to_vote,
+                              color: ThemeColors.grey,
+                            ),
+                            SizedBox(
+                              width: ThemePadding.padBase / 2,
+                            ),
+                            Text(
+                              "${widget.post.contributions!.length}",
+                              style: ThemeTexTStyle.regular(
+                                  color: ThemeColors.grey),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.share,
+                              color: ThemeColors.grey,
+                            ),
+                            SizedBox(
+                              width: ThemePadding.padBase / 2,
+                            ),
+                            Text(
+                              "${widget.post.shares!}",
+                              style: ThemeTexTStyle.regular(
+                                  color: ThemeColors.grey),
+                            )
+                          ],
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return ResultMapView();
+                            }));
+                          },
+                          child: Icon(
+                            Icons.list_alt,
+                            color: ThemeColors.grey,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.how_to_vote,
+                              color: ThemeColors.grey,
+                            ),
+                            SizedBox(
+                              width: ThemePadding.padBase / 2,
+                            ),
+                            Text(
+                              "${widget.post.contributions!.length}",
+                              style: ThemeTexTStyle.regular(
+                                  color: ThemeColors.grey),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.share,
+                              color: ThemeColors.grey,
+                            ),
+                            SizedBox(
+                              width: ThemePadding.padBase / 2,
+                            ),
+                            Text(
+                              "${widget.post.shares!}",
+                              style: ThemeTexTStyle.regular(
+                                  color: ThemeColors.grey),
+                            )
+                          ],
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            bool response = await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Contribute(
+                                    images: widget.post.imgs,
+                                  );
+                                });
+                            if (response) {
+                              OnPopModel? onPopModel =
+                                  await Navigator.push(context,
+                                      MaterialPageRoute(builder: (context) {
+                                return Contribution(
+                                  postId: widget.post.id!,
+                                );
+                              }));
+                              if (onPopModel != null && onPopModel.reloadPrev) {
+                                dashboardBloc.getFeedBody();
+                              }
+                            }
+                          },
+                          child: Icon(
+                            Icons.comment,
+                            color: ThemeColors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+            )
+          ],
+        ),
+      );
+    });
   }
 }
 
