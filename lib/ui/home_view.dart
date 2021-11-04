@@ -21,12 +21,7 @@ class HomeView extends StatelessWidget {
           DashboardView(),
         
       ),
-      floatingActionButton: FloatingActionButton(focusColor: ThemeColors.primary,
-      child: Icon(Icons.add),
-      onPressed: (){
-        Navigator.push(context, MaterialPageRoute(builder:(context)=>CreatePostView() ));
-      },
-      ),
+     
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
       // bottomNavigationBar: BottomAppBar(

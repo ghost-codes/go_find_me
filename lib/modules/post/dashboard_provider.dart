@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_android/components/dialogs.dart';
+import 'package:project_android/core/network/networkError.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/PostModel.dart';
 import 'package:project_android/modules/base_provider.dart';
@@ -14,6 +16,8 @@ class DashBoardEvent<T> {
 }
 
 class DashboardProvider extends BaseProvider<DashBoardEvent> {
+  bool confirmDelete = false;
+
   DashboardProvider() {
     getFeedBody();
   }
@@ -37,18 +41,16 @@ class DashboardProvider extends BaseProvider<DashBoardEvent> {
   deletePost(String postId, BuildContext context) async {
     addEvent(DashBoardEvent(state: DashBoardEventState.isloading));
 
-    var response = await _api.deletePost(postId);
-    if (response == null) {
-      addEvent(
-        DashBoardEvent(
-          state: DashBoardEventState.error,
-          data: "Could not delete because error occured",
-        ),
-      );
-      return;
+    try {
+      var response = await _api.deletePost(postId);
+
+      Navigator.of(context).pop();
+      currentData?.removeWhere((element) => element?.id == postId);
+      addEvent(DashBoardEvent(state: DashBoardEventState.success));
+    } on NetworkError catch (err) {
+      addEvent(DashBoardEvent(state: DashBoardEventState.error));
+      Dialogs.errorDialog(context, err.error);
+      Navigator.of(context).pop();
     }
-    currentData?.removeWhere((element) => element?.id == postId);
-    addEvent(DashBoardEvent(state: DashBoardEventState.success));
-    Navigator.of(context).pop();
   }
 }

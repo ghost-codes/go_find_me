@@ -19,6 +19,7 @@ import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:project_android/ui/contribution.dart';
+import 'package:project_android/ui/create_post.dart';
 import 'package:project_android/ui/editPost.dart';
 import 'package:project_android/ui/result_map_view.dart';
 import 'package:provider/provider.dart';
@@ -44,47 +45,58 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => DashboardProvider(),
-      child: SafeArea(
-        child:
-            Consumer<DashboardProvider>(builder: (context, dashboardProv, _) {
-          return Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            child: CustomScrollView(
-              clipBehavior: Clip.none,
-              slivers: [
-                SliverAppBar(
-                  floating: true,
-                  title: AppBarWidget(),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20),
-                      bottomRight: Radius.circular(20),
+      child: Consumer<DashboardProvider>(builder: (context, dashboardProv, _) {
+        return Scaffold(
+          floatingActionButton: FloatingActionButton(
+            focusColor: ThemeColors.primary,
+            child: Icon(Icons.add),
+            onPressed: () async {
+              OnPopModel? onPopModel = await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CreatePostView()));
+              if (onPopModel != null && onPopModel.reloadPrev) {
+                print("hell");
+                dashboardProv.getFeedBody();
+              }
+            },
+          ),
+          body: SafeArea(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await dashboardProv.getFeedBody();
+                },
+                child: CustomScrollView(
+                  clipBehavior: Clip.none,
+                  slivers: [
+                    SliverAppBar(
+                      floating: true,
+                      title: AppBarWidget(),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                      ),
+                      automaticallyImplyLeading: false,
+                      elevation: 20,
+                      shadowColor: ThemeColors.black,
+                      backgroundColor: ThemeColors.white,
                     ),
-                  ),
-                  automaticallyImplyLeading: false,
-                  elevation: 20,
-                  shadowColor: ThemeColors.black,
-                  backgroundColor: ThemeColors.white,
-                ),
-                SliverList(
-                  delegate: SliverChildListDelegate(
-                      dashboardProv.lastEvent?.state !=
+                    SliverList(
+                      delegate: SliverChildListDelegate(dashboardProv
+                                      .lastEvent?.state ==
                                   DashBoardEventState.isloading &&
-                              (dashboardProv.currentData?.length != 0 ||
-                                  dashboardProv.currentData != null)
-                          ? dashboardProv.currentData?.length == 0 ||
+                              (dashboardProv.currentData?.length == 0 ||
+                                  dashboardProv.currentData == null)
+                          ? [
+                              Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ]
+                          : dashboardProv.currentData?.length == 0 ||
                                   dashboardProv.currentData == null
                               ? [
-                                  // StreamBuilder<bool>(
-                                  //     initialData: false,
-                                  //     stream: bloc.reloadStream,
-                                  //     builder: (context, snapshot) {
-                                  //       return snapshot.data!
-                                  //           ? LinearProgressIndicator(
-                                  //               color: ThemeColors.primary,
-                                  //             )
-                                  //           : SizedBox.shrink();
-                                  //     }),
                                   Center(
                                     child: Text(
                                       "No Posts To Show",
@@ -110,19 +122,19 @@ class _DashboardViewState extends State<DashboardView> {
                                       authBloc: authBloc,
                                       post: dashboardProv.currentData![index]!,
                                     ),
+                                  ),
+                                  SizedBox(
+                                    height: 50,
                                   )
-                                ]
-                          : [
-                              Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            ]),
-                )
-              ],
+                                ]),
+                    )
+                  ],
+                ),
+              ),
             ),
-          );
-        }),
-      ),
+          ),
+        );
+      }),
     );
   }
 }
@@ -145,8 +157,6 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   bool descContainerSize = false;
 
-  DashboardBloc dashboardBloc = sl<DashboardBloc>();
-
   @override
   Widget build(BuildContext context) {
     return Consumer<DashboardProvider>(builder: (context, dashboardProv, _) {
@@ -164,9 +174,12 @@ class _PostCardState extends State<PostCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Missing: ${widget.post.title}",
-                  style: ThemeTexTStyle.titleTextStyleBlack,
+                Expanded(
+                  child: Text(
+                    "Missing: ${widget.post.title}",
+                    style: ThemeTexTStyle.titleTextStyleBlack,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 widget.post.userId == widget.authBloc.user?.id
                     ? InkWell(
@@ -175,32 +188,16 @@ class _PostCardState extends State<PostCard> {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: Text("Post Actions"),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ListTile(
-                                        title: Text("Edit Post"),
-                                        onTap: () async {
-                                          bool res = await Navigator.push(
-                                              context, MaterialPageRoute(
-                                                  builder: (context) {
-                                            return EditPost(
-                                              post: widget.post,
-                                            );
-                                          })) as bool;
-                                          if (res)
-                                            Navigator.of(context).pop(true);
-                                        },
-                                      ),
-                                      ListTile(
-                                        title: Text("Delete Post"),
-                                        onTap: () {
-                                          dashboardProv.deletePost(
-                                              widget.post.id!, context);
-                                        },
-                                      )
-                                    ],
+                                  title: Text(
+                                    "Post Actions",
+                                    style: ThemeTexTStyle.headerPrim,
+                                  ),
+                                  content: PostOptionsDialog(
+                                    post: widget.post,
+                                    deletePost: () {
+                                      dashboardProv.deletePost(
+                                          widget.post.id!, context);
+                                    },
                                   ),
                                 );
                               });
@@ -402,7 +399,8 @@ class _PostCardState extends State<PostCard> {
                                 );
                               }));
                               if (onPopModel != null && onPopModel.reloadPrev) {
-                                dashboardBloc.getFeedBody();
+                                print("hell");
+                                dashboardProv.getFeedBody();
                               }
                             }
                           },
@@ -418,6 +416,74 @@ class _PostCardState extends State<PostCard> {
         ),
       );
     });
+  }
+}
+
+class PostOptionsDialog extends StatefulWidget {
+  PostOptionsDialog({Key? key, required this.post, required this.deletePost})
+      : super(key: key);
+  final Post post;
+  final Function deletePost;
+
+  @override
+  State<PostOptionsDialog> createState() => _PostOptionsDialogState();
+}
+
+class _PostOptionsDialogState extends State<PostOptionsDialog> {
+  bool isConfirmDelete = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return isConfirmDelete
+        ? Row(
+            children: [
+              Expanded(
+                child: ThemeButton.ButtonPrim(
+                  text: "Yes",
+                  onpressed: widget.deletePost,
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: ThemeButton.ButtonSec(
+                    text: "No",
+                    onpressed: () {
+                      setState(() {
+                        isConfirmDelete = !isConfirmDelete;
+                      });
+                    }),
+              ),
+            ],
+          )
+        : Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Edit Post"),
+                onTap: () async {
+                  bool res = await Navigator.push(context,
+                      MaterialPageRoute(builder: (context) {
+                    return EditPost(
+                      post: widget.post,
+                    );
+                  })) as bool;
+                  if (res) Navigator.of(context).pop(true);
+                },
+              ),
+              ListTile(
+                title: Text("Delete Post"),
+                onTap: () {
+                  setState(() {
+                    isConfirmDelete = !isConfirmDelete;
+                  });
+                },
+              )
+            ],
+          );
+
+    ;
   }
 }
 

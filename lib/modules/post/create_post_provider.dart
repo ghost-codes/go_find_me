@@ -8,6 +8,7 @@ import 'package:project_android/blocs/authenticationBloc.dart';
 import 'package:project_android/blocs/home_bloc.dart';
 import 'package:project_android/components/dialogs.dart';
 import 'package:project_android/locator.dart';
+import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/models/PostModel.dart';
 import 'package:project_android/modules/base_provider.dart';
 import 'package:project_android/services/api.dart';
@@ -80,9 +81,9 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
         });
 
         if (response != null) {
-          dashboardBloc.getFeedBody();
+        
           addEvent(CreatePostEvent(state: CreatePostEventState.success));
-          Navigator.pop(context, response);
+          Navigator.pop(context, OnPopModel(reloadPrev: true));
         }
         addEvent(CreatePostEvent(
             state: CreatePostEventState.error,
