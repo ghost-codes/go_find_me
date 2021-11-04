@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { LoginEmailDTO } from './dto/login.dto';
 import { RefreshTokenDTO } from './dto/refreshToken.dto';
 
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
