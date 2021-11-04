@@ -1,8 +1,12 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Post, PostDocument } from './schema/post.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreatePost } from './createpost.interface';
+import { CreatePost, UpdatePost } from './createpost.interface';
 
 @Injectable()
 export class PostService {
@@ -23,5 +27,20 @@ export class PostService {
       throw new InternalServerErrorException('Sorry Error Occured');
 
     return savedPost;
+  }
+
+  async updatePost(updatePostModel: UpdatePost): Promise<Post> {
+    const updatedPost = this.postModel.findByIdAndUpdate(
+      updatePostModel.id,
+      updatePostModel,
+    );
+    if (!updatedPost) throw new NotFoundException('Post not found');
+    return updatedPost;
+  }
+
+  async deletePost(postId: string): Promise<string> {
+    const deletedpost = this.postModel.findByIdAndDelete(postId);
+    if (!deletedpost) throw new NotFoundException('Post does not exist');
+    return 'The post has been deleted';
   }
 }
