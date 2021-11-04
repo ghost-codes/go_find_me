@@ -21,7 +21,7 @@ import { UpdatePostDTO } from './dto/updatePost.dto';
 import { PostService } from './post.service';
 // import { Post } from './schema/post.schema';
 
-@Controller('post')
+@Controller('api/post')
 export class PostController {
   constructor(
     private postService: PostService,
