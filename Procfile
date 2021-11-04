@@ -1,1 +1,1 @@
-web: node app/src/main.ts
+web: npm run start:prod
