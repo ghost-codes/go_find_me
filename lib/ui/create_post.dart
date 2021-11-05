@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:project_android/blocs/createPostBloc.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/modules/post/create_post_provider.dart';

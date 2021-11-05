@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_android/blocs/dashboard_bloc.dart';
 import 'package:project_android/blocs/authenticationBloc.dart';
-import 'package:project_android/blocs/home_bloc.dart';
+
 import 'package:project_android/components/dialogs.dart';
+import 'package:project_android/core/network/networkError.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/models/PostModel.dart';
@@ -28,7 +29,6 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
   Api _api = sl<Api>();
   AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
 
-  HomeBloc homeBloc = sl<HomeBloc>();
   DashboardBloc dashboardBloc = sl<DashboardBloc>();
   List<XFile>? _images = [];
   List<Uint8List> memImages = [];
@@ -56,9 +56,13 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
   }
 
   onCreatePost(BuildContext context) async {
-    if (_images!.length >= 2) {
-      if (_formKey.currentState!.validate()) {
-        addEvent(CreatePostEvent(state: CreatePostEventState.loading));
+    if (_images!.length < 2) {
+      Dialogs.errorDialog(context, "Please add 2 or more images");
+      return;
+    }
+    if (_formKey.currentState!.validate()) {
+      addEvent(CreatePostEvent(state: CreatePostEventState.loading));
+      try {
         List<MultipartFile> files = [];
         _images?.forEach((element) async {
           files.add(MultipartFile.fromFileSync(element.path));
@@ -73,24 +77,18 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
             "location": lastSeenLocation.text,
             "date": _lastSeenDate!.toIso8601String()
           }
-        }).onError((error, stackTrace) {
-          addEvent(CreatePostEvent(
-              state: CreatePostEventState.error, data: error.toString()));
-
-          Dialogs.errorDialog(context, error.toString());
         });
 
         if (response != null) {
-        
           addEvent(CreatePostEvent(state: CreatePostEventState.success));
           Navigator.pop(context, OnPopModel(reloadPrev: true));
         }
+      } on NetworkError catch (netErr) {
         addEvent(CreatePostEvent(
-            state: CreatePostEventState.error,
-            data: "Error occured please try again."));
+          state: CreatePostEventState.error,
+        ));
+        Dialogs.errorDialog(context, netErr.error);
       }
-    } else {
-      Dialogs.errorDialog(context, "Please add 2 or more images");
     }
   }
 
@@ -111,11 +109,8 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
 
   onMoreImageUpload() async {
     final ImagePicker _picker = ImagePicker();
-    _images = [
-      ..._images ?? [],
-      ...(await _picker.pickMultiImage(imageQuality: 8 - _images!.length)) ?? []
-    ];
-    List<Uint8List> memImages = [];
+    _images = [..._images ?? [], ...(await _picker.pickMultiImage()) ?? []];
+    memImages = [];
     _images!.forEach((element) async {
       final e = await element.readAsBytes();
       memImages.add(e);

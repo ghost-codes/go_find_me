@@ -16,9 +16,10 @@ class DashBoardEvent<T> {
 }
 
 class DashboardProvider extends BaseProvider<DashBoardEvent> {
+  BuildContext rootContext;
   bool confirmDelete = false;
 
-  DashboardProvider() {
+  DashboardProvider({required this.rootContext}) {
     getFeedBody();
   }
 
@@ -29,13 +30,18 @@ class DashboardProvider extends BaseProvider<DashBoardEvent> {
   getFeedBody() async {
     addEvent(DashBoardEvent(state: DashBoardEventState.isloading));
 
-    List<Post?> response = await _api.getFeed();
-    if (response == null) {
+    try {
+      List<Post?> response = await _api.getFeed();
+      if (response == null) {
+        addEvent(DashBoardEvent(state: DashBoardEventState.error));
+        return;
+      }
+      currentData = response.reversed.toList();
+      addEvent(DashBoardEvent(state: DashBoardEventState.success));
+    } on NetworkError catch (netErr) {
       addEvent(DashBoardEvent(state: DashBoardEventState.error));
-      return;
+      Dialogs.errorDialog(rootContext, netErr.error);
     }
-    currentData = response.reversed.toList();
-    addEvent(DashBoardEvent(state: DashBoardEventState.success));
   }
 
   deletePost(String postId, BuildContext context) async {

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/services/placesService.dart';
 import 'package:uuid/uuid.dart';
@@ -21,7 +22,7 @@ class LocationTextField extends StatefulWidget {
   _LocationTextFieldState createState() => _LocationTextFieldState();
 }
 
-class _LocationTextFieldState extends State<LocationTextField> {
+class _LocationTextFieldState extends State<LocationTextField> with InputDec {
   final FocusNode _focusNode = FocusNode();
 
   PlacesService _placesService = sl<PlacesService>();
@@ -102,16 +103,17 @@ class _LocationTextFieldState extends State<LocationTextField> {
         onChanged: (String value) async {
           placeApiCall(value);
         },
-        decoration: InputDecoration(
-          border: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.grey,
-              width: 1,
-              style: BorderStyle.solid,
-            ),
-          ),
-          hintText: widget.hintText,
-        ),
+        decoration: inputDec(hint: widget.hintText),
+        // decoration: InputDecoration(
+        //   border: OutlineInputBorder(
+        //     borderSide: BorderSide(
+        //       color: Colors.grey,
+        //       width: 1,
+        //       style: BorderStyle.solid,
+        //     ),
+        //   ),
+        //   hintText: widget.hintText,
+        // ),
       ),
     );
   }

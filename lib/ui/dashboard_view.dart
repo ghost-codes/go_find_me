@@ -4,8 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:project_android/blocs/authenticationBloc.dart';
-import 'package:project_android/blocs/dashboard_bloc.dart';
-import 'package:project_android/blocs/home_bloc.dart';
+
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/locator.dart';
@@ -32,7 +31,6 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-  HomeBloc homeBloc = sl<HomeBloc>();
   AuthenticationBloc authBloc = sl<AuthenticationBloc>();
 
   @override
@@ -44,7 +42,7 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => DashboardProvider(),
+      create: (context) => DashboardProvider(rootContext: context),
       child: Consumer<DashboardProvider>(builder: (context, dashboardProv, _) {
         return Scaffold(
           floatingActionButton: FloatingActionButton(

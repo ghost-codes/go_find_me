@@ -12,7 +12,10 @@ class NetworkError implements Exception {
   onDioError(DioError error) {
     switch (error.type) {
       case DioErrorType.other:
-        if (error.error is SocketException) errorMessage = "Connnection Error";
+        if (error.error is SocketException)
+          errorMessage = "Connnection Error";
+        else
+          errorMessage = "Unexpected Error";
         break;
       case DioErrorType.cancel:
         errorMessage = "Request cancelled";
@@ -26,6 +29,8 @@ class NetworkError implements Exception {
       case DioErrorType.response:
         if (error.response?.statusCode == 500)
           errorMessage = 'Error: Server Error';
+        else
+          errorMessage = 'Unexpected: Server Error';
         break;
       default:
         errorMessage = 'Error: Unexpected Error';

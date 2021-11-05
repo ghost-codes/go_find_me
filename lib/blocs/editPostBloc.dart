@@ -21,14 +21,7 @@ class EditPostBloc {
 
   TextEditingController? title;
 
-  // StreamController<CreatePostActions> createPostActions =
-  //     StreamController.broadcast();
   DateTime lastSeenDate = DateTime.now();
-
-  // Stream<CreatePostActions> get _createPostActionsStream =>
-  //     createPostActions.stream;
-  // StreamSink<CreatePostActions> get createPostActionsSink =>
-  //     createPostActions.sink;
 
   StreamController<List<dynamic>> _imagesStreamController =
       StreamController<List<dynamic>>.broadcast();
