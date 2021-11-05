@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:project_android/blocs/dashboard_bloc.dart';
 import 'package:project_android/blocs/authenticationBloc.dart';
 
 import 'package:project_android/components/dialogs.dart';
@@ -49,17 +48,18 @@ class EditPostProvider extends BaseProvider<EditPostEvent> {
     _lastSeenDate = post?.lastSeen?.date;
     oldImages = post?.imgs;
     displayImages = [...oldImages!];
+    status = post?.status;
     addEvent(EditPostEvent(state: EditPostEventState.idle));
   }
 
   Api _api = sl<Api>();
   AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
 
-  DashboardBloc dashboardBloc = sl<DashboardBloc>();
-
   List<XFile>? _images = [];
   List<Uint8List> memImages = [];
   List<dynamic> displayImages = [];
+
+  String? status = "Not Found";
 
   // Form Key
 
@@ -69,6 +69,11 @@ class EditPostProvider extends BaseProvider<EditPostEvent> {
     }
 
     return null;
+  }
+
+  onStatusChange(String? value) {
+    status = value;
+    notifyListeners();
   }
 
   onImageUpload() async {
@@ -98,7 +103,7 @@ class EditPostProvider extends BaseProvider<EditPostEvent> {
     notifyListeners();
   }
 
-  onSubmitPost(BuildContext context, String postId, String status) async {
+  onSubmitPost(BuildContext context, String postId) async {
     if ((_images!.length + oldImages!.length) < 2) {
       Dialogs.errorDialog(context, "Please add 2 or more images");
       return;
@@ -124,7 +129,7 @@ class EditPostProvider extends BaseProvider<EditPostEvent> {
             "date": lastSeenDate!.toIso8601String()
           }
         }, postId);
-        if (response) Navigator.pop(context, true);
+        if (response) Navigator.pop(context, OnPopModel(reloadPrev: true));
       } on NetworkError catch (err) {
         Dialogs.errorDialog(context, err.errorMessage!);
       }

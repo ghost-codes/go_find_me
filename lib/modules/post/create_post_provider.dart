@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:project_android/blocs/dashboard_bloc.dart';
 import 'package:project_android/blocs/authenticationBloc.dart';
 
 import 'package:project_android/components/dialogs.dart';
@@ -29,7 +28,6 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
   Api _api = sl<Api>();
   AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
 
-  DashboardBloc dashboardBloc = sl<DashboardBloc>();
   List<XFile>? _images = [];
   List<Uint8List> memImages = [];
 

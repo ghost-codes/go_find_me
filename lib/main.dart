@@ -5,10 +5,10 @@ import 'package:project_android/ui/splash_view.dart';
 
 void main() {
   setuplocator();
-  runApp(MyApp());
+  runApp(GoFindMeApp());
 }
 
-class MyApp extends StatelessWidget {
+class GoFindMeApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

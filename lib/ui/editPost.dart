@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:project_android/blocs/editPostBloc.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/locator.dart';
@@ -26,19 +25,10 @@ class EditPost extends StatefulWidget {
 }
 
 class _EditPostState extends State<EditPost> with InputDec {
-  EditPostBloc _editPostBloc = sl<EditPostBloc>();
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _editPostBloc.lastSeenLocation =
-        TextEditingController(text: widget.post!.lastSeen!.location!);
-    _editPostBloc.title = TextEditingController(text: widget.post!.title);
-    _editPostBloc.postDescription =
-        TextEditingController(text: widget.post!.desc);
-    _editPostBloc.lastSeenDateSink.add(widget.post!.lastSeen!.date!);
-    _editPostBloc.oldImages = widget.post!.imgs;
   }
 
   @override
@@ -190,73 +180,58 @@ class _EditPostState extends State<EditPost> with InputDec {
                             ),
                             SizedBox(height: 10),
                             Container(
-                              // height: 50,
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  StreamBuilder<DateTime>(
-                                      stream: _editPostBloc.lastSeenDateStream,
-                                      builder: (context, snapshot) {
-                                        _editPostBloc.lastSeenDate =
-                                            snapshot.data ?? DateTime.now();
-                                        return Text(snapshot.data != null
-                                            ? DateFormat("MMM dd, yyy").format(
-                                                snapshot.data ?? DateTime.now())
-                                            : _editPostBloc.lastSeenDate != null
-                                                ? DateFormat("MMM dd, yyy")
-                                                    .format(_editPostBloc
-                                                        .lastSeenDate)
-                                                : "Select Date");
-                                      }),
+                                  Text(
+                                    editPostProv.lastSeenDate != null
+                                        ? DateFormat("MMM dd, yyy")
+                                            .format(editPostProv.lastSeenDate!)
+                                        : "Select Date",
+                                    style: ThemeTexTStyle.titleTextStyleBlack,
+                                  ),
                                   ThemeButton.ButtonSec(
                                       text: "Select",
                                       onpressed: () {
                                         showDialog(
                                             context: context,
                                             builder: (context) {
+                                              // return Container(
+                                              // child: SfDateRangePicker());
+
                                               return AlertDialog(
-                                                content: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Container(
-                                                      decoration: BoxDecoration(
-                                                          color: ThemeColors
-                                                              .white),
-                                                      child: Center(
-                                                          child:
-                                                              SfDateRangePicker(
-                                                        showActionButtons: true,
-                                                        onSubmit: (x) {
-                                                          if (x is DateTime) {
-                                                            _editPostBloc
-                                                                .lastSeenDateSink
-                                                                .add(x);
-                                                          }
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        onCancel: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        selectionMode:
-                                                            DateRangePickerSelectionMode
-                                                                .single,
-                                                        maxDate: DateTime.now(),
-                                                        onSelectionChanged:
-                                                            (DateRangePickerSelectionChangedArgs
-                                                                x) {
-                                                          _editPostBloc
-                                                              .lastSeenDateSink
-                                                              .add(x.value);
-                                                        },
-                                                      )),
-                                                    ),
-                                                  ],
+                                                  content: Container(
+                                                height: 350,
+                                                width: 350,
+                                                margin: EdgeInsets.all(5),
+                                                child: SfDateRangePicker(
+                                                  maxDate: DateTime.now(),
+                                                  initialDisplayDate:
+                                                      DateTime.now(),
+                                                  showActionButtons: true,
+                                                  onSubmit: (x) {
+                                                    if (x is DateTime) {
+                                                      editPostProv
+                                                          .setLastSeenDate(x);
+                                                    }
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  onCancel: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  selectionMode:
+                                                      DateRangePickerSelectionMode
+                                                          .single,
+                                                  onSelectionChanged:
+                                                      (DateRangePickerSelectionChangedArgs
+                                                          x) {
+                                                    editPostProv
+                                                        .setLastSeenDate(
+                                                            x.value);
+                                                  },
                                                 ),
-                                              );
+                                              ));
                                             });
                                       }),
                                 ],
@@ -268,14 +243,14 @@ class _EditPostState extends State<EditPost> with InputDec {
                                   editPostProv.isEmptyValidator(
                                       value!, "Last Seen Location"),
                               hintText: "Last Seen Location",
-                              controller: _editPostBloc.lastSeenLocation,
+                              controller: editPostProv.lastSeenLocation,
                               // resultSink:
                             ),
                             SizedBox(height: 10),
                             TextFormField(
                               validator: (String? value) => editPostProv
                                   .isEmptyValidator(value!, "Description"),
-                              controller: _editPostBloc.postDescription,
+                              controller: editPostProv.postDescription,
                               maxLines: 5,
                               decoration: inputDec(hint: "Post Description"),
                               // decoration: InputDecoration(
@@ -292,35 +267,25 @@ class _EditPostState extends State<EditPost> with InputDec {
                             SizedBox(
                               height: 10,
                             ),
-                            StreamBuilder<String>(
-                                stream: _editPostBloc.statusStream,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData)
-                                    widget.post!.status = snapshot.data;
-                                  return DropdownButton(
-                                      isExpanded: true,
-                                      onChanged: (String? value) {
-                                        _editPostBloc.statusSink.add(value!);
-                                      },
-                                      value: snapshot.hasData
-                                          ? snapshot.data
-                                          : widget.post!.status,
-                                      items: [
-                                        DropdownMenuItem(
-                                          value: "Not Found",
-                                          child: Text("Not Found"),
-                                        ),
-                                        DropdownMenuItem(
-                                            value: "Found",
-                                            child: Text("Found"))
-                                      ]);
-                                }),
+                            DropdownButton(
+                                isExpanded: true,
+                                onChanged: editPostProv.onStatusChange,
+                                value: editPostProv.status,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: "Not Found",
+                                    child: Text("Not Found"),
+                                  ),
+                                  DropdownMenuItem(
+                                      value: "Found", child: Text("Found"))
+                                ]),
+
                             SizedBox(height: 10),
                             ThemeButton.longButtonPrim(
                                 text: "Edit Post",
                                 onpressed: () {
-                                  editPostProv.onSubmitPost(context,
-                                      widget.post!.id!, widget.post!.status!);
+                                  editPostProv.onSubmitPost(
+                                      context, widget.post!.id!);
                                 }),
                           ],
                         ),

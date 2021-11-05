@@ -182,7 +182,7 @@ class _PostCardState extends State<PostCard> {
                 widget.post.userId == widget.authBloc.user?.id
                     ? InkWell(
                         onTap: () async {
-                          var res = await showDialog(
+                          OnPopModel res = await showDialog(
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
@@ -199,7 +199,7 @@ class _PostCardState extends State<PostCard> {
                                   ),
                                 );
                               });
-                          // if (res) dash.getFeedBody();
+                          if (res.reloadPrev) dashboardProv.getFeedBody();
                         },
                         child: Icon(
                           Icons.more_vert,
