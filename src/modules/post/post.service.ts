@@ -8,10 +8,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreatePost, UpdatePost } from './createpost.interface';
 
+import { InjectConnection } from '@nestjs/mongoose';
+import { ImageUploadService } from '../image-upload/image-upload.service';
+import { Connection } from 'mongoose';
+
 @Injectable()
 export class PostService {
   constructor(
+    @InjectConnection() private readonly connection: Connection,
+
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    private readonly imageUploadService: ImageUploadService,
   ) {}
 
   async getPosts(): Promise<Post[]> {
@@ -38,9 +45,19 @@ export class PostService {
     return updatedPost;
   }
 
-  async deletePost(postId: string): Promise<string> {
-    const deletedpost = this.postModel.findByIdAndDelete(postId);
-    if (!deletedpost) throw new NotFoundException('Post does not exist');
-    return 'The post has been deleted';
+  async deletePost(postId: string): Promise<boolean> {
+    const deletedpost: Post = await this.postModel.findById(postId);
+    const keys: string[] = [];
+    deletedpost.imgs.forEach(async (imagePath: string) => {
+      const pathSections: string[] = imagePath.split('/');
+      console.log(pathSections);
+      keys.push(pathSections.pop());
+    });
+    await this.imageUploadService.deleteFile(keys);
+    const deletPost: Post = await this.postModel.findByIdAndDelete(postId);
+    if (!deletPost)
+      throw new InternalServerErrorException('Error Could not delete post');
+
+    return true;
   }
 }

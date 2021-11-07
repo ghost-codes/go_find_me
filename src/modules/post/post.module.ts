@@ -1,19 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
-import { MulterModule } from '@nestjs/platform-express';
-import { FilesModule } from 'src/global/gridfs/files.module';
-import { FileService } from 'src/global/gridfs/files.service';
-import { GridFsMulterConfigeService } from 'src/global/gridfs/gridfs.config';
+import { ImageUploadModule } from '../image-upload/image-upload.module';
+import { ImageUploadService } from '../image-upload/image-upload.service';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { Post, PostSchema } from './schema/post.schema';
 
 @Module({
   imports: [
-    MulterModule.registerAsync({
-      useClass: GridFsMulterConfigeService,
-    }),
     MongooseModule.forFeatureAsync([
       {
         name: Post.name,
@@ -25,8 +20,10 @@ import { Post, PostSchema } from './schema/post.schema';
       },
     ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
+    ImageUploadService,
+    ImageUploadModule,
   ],
   controllers: [PostController],
-  providers: [PostService, FileService],
+  providers: [PostService],
 })
 export class PostModule {}
