@@ -23,7 +23,7 @@ export class Post extends Document {
   @Prop()
   privilleged: string[];
 
-  @Prop()
+  @Prop({default:0})
   shares: number;
 
   @Prop(
@@ -33,6 +33,9 @@ export class Post extends Document {
     }),
   )
   last_seen: Record<string, any>;
+  
+  @Prop({default:"Not Found"})
+  status:string;
 
   @Prop({default:Date.now})
   created_at:Date;
