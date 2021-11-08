@@ -24,25 +24,25 @@ export class PostController {
     return this.postService.getPosts();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   createPost(@UploadedFiles() files, @Body() body: CreatePostDTO) {
     return this.postService.createPost(body);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Put(':postId')
   updatePost(@Body() body: UpdatePostDTO) {
     return this.postService.updatePost(body);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete('delete_post/:postId')
   deletePost(@Param('postId') postId: string) {
     return this.postService.deletePost(postId);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('create_contribution')
   crateContribution(
     @Body() createContribution: CreateContributionDTO,
