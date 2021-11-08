@@ -6,11 +6,16 @@ import {
 import { Post, PostDocument } from './schema/post.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreatePost, UpdatePost } from './createpost.interface';
+import { CreatePost, UpdatePost } from './interfaces/createpost.interface';
 
 import { InjectConnection } from '@nestjs/mongoose';
 import { ImageUploadService } from '../image-upload/image-upload.service';
 import { Connection } from 'mongoose';
+import {
+  Contribution,
+  ContributionDocument,
+} from './schema/contribution.schema';
+import { CreateContribution } from './interfaces/create_contribution.interface';
 
 @Injectable()
 export class PostService {
@@ -19,6 +24,9 @@ export class PostService {
 
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
     private readonly imageUploadService: ImageUploadService,
+
+    @InjectModel(Contribution.name)
+    private readonly contributionModel: Model<ContributionDocument>,
   ) {}
 
   async getPosts(): Promise<Post[]> {
@@ -46,18 +54,45 @@ export class PostService {
   }
 
   async deletePost(postId: string): Promise<boolean> {
-    const deletedpost: Post = await this.postModel.findById(postId);
+    const post: Post = await this.postModel.findById(postId);
     const keys: string[] = [];
-    deletedpost.imgs.forEach(async (imagePath: string) => {
+    post.imgs.forEach(async (imagePath: string) => {
       const pathSections: string[] = imagePath.split('/');
       console.log(pathSections);
       keys.push(pathSections.pop());
     });
     await this.imageUploadService.deleteFile(keys);
-    const deletPost: Post = await this.postModel.findByIdAndDelete(postId);
-    if (!deletPost)
+
+    post.contributions.forEach(
+      async (element) =>
+        await this.contributionModel.findByIdAndDelete(element),
+    );
+
+    const deletedPost: Post = await this.postModel.findByIdAndDelete(postId);
+    if (!deletedPost)
       throw new InternalServerErrorException('Error Could not delete post');
 
     return true;
+  }
+
+  async createContribution(
+    createContribution: CreateContribution,
+  ): Promise<Post> {
+    const newContribution = new this.contributionModel(createContribution);
+
+    const savedContribution = await newContribution.save();
+    if (!savedContribution)
+      throw new InternalServerErrorException('Sorry Error Occured');
+
+    const post = await this.postModel.findById(savedContribution.post_id);
+    post.contributions = [...post.contributions, savedContribution.id];
+    const updatedPost = await this.postModel.findByIdAndUpdate(
+      savedContribution.post_id,
+      post,
+    );
+
+    if (!updatedPost)
+      throw new InternalServerErrorException('Sorry Error Occured');
+    return updatedPost;
   }
 }
