@@ -61,7 +61,7 @@ export class PostService {
       console.log(pathSections);
       keys.push(pathSections.pop());
     });
-    await this.imageUploadService.deleteFile(keys);
+    await this.imageUploadService.deleteFiles(keys);
 
     post.contributions.forEach(
       async (element) =>

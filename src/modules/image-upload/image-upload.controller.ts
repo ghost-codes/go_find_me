@@ -1,5 +1,15 @@
-import { Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { DeleteImageDTO } from './dtos/deleteImage.dto';
 import { ImageUploadService } from './image-upload.service';
 
 @ApiConsumes('multipart/form-data')
@@ -15,6 +25,18 @@ export class ImageUploadController {
         .status(500)
         .json(`Failed to upload image file: ${error.message}`);
     }
+  }
+
+  @Delete('delete')
+  async deleteFiles(@Body() imagePaths: DeleteImageDTO) {
+    const imageKeys: string[] = [];
+    imagePaths.imgs.forEach(async (imagePath: string) => {
+      const pathSections: string[] = imagePath.split('/');
+
+      imageKeys.push(pathSections.pop());
+    });
+
+    return this.imageUploadService.deleteFiles(imageKeys);
   }
 
   @Get(':key')

@@ -46,7 +46,7 @@ export class ImageUploadService {
     return stream;
   }
 
-  async deleteFile(keys: string[]): Promise<any> {
+  async deleteFiles(keys: string[]): Promise<any> {
     const keyObject = [];
     keys.forEach((element) => {
       keyObject.push({ Key: element });
