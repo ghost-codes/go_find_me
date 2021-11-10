@@ -20,7 +20,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refreshToken(@Body() data: RefreshTokenDTO) {
+  async refreshToken(@Body() data: RefreshTokenDTO): Promise<any> {
     return this.authService.refreshAccessToken(data.refreshToken);
   }
 }

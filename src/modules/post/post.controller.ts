@@ -32,7 +32,8 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard)
   @Put(':postId')
-  updatePost(@Body() body: UpdatePostDTO) {
+  updatePost(@Body() body: UpdatePostDTO, @Param('postId') postId: string) {
+    console.log(postId);
     return this.postService.updatePost(body);
   }
 
