@@ -10,9 +10,11 @@ import 'package:project_android/core/network/networkError.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/models/PostModel.dart';
+import 'package:project_android/modules/auth/authProvider.dart';
 import 'package:project_android/modules/base_provider.dart';
 import 'package:project_android/services/api.dart';
 import 'package:project_android/util/validators.dart';
+import 'package:provider/provider.dart';
 
 enum CreatePostEventState { idle, loading, error, success }
 
@@ -26,8 +28,6 @@ class CreatePostEvent<T> {
 // Create Post Provider
 class CreatePostProvider extends BaseProvider<CreatePostEvent> {
   Api _api = sl<Api>();
-  AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
-
   List<XFile>? _images = [];
   List<Uint8List> memImages = [];
 
@@ -66,20 +66,32 @@ class CreatePostProvider extends BaseProvider<CreatePostEvent> {
           files.add(MultipartFile.fromFileSync(element.path));
         });
 
-        Post? response = await _api.createPost({
-          "userId": _authBloc.user?.id,
-          "desc": postDescription.text,
-          "title": title.text,
-          "uploads": files,
-          "last_seen": {
-            "location": lastSeenLocation.text,
-            "date": _lastSeenDate!.toIso8601String()
-          }
-        });
+        List<dynamic>? imgPaths = await _api.uploadImages({"upload": files});
+        if (imgPaths == null) return;
+        try {
+          Post? response = await _api.createPost({
+            "user_id":
+                Provider.of<AuthenticationProvider>(context, listen: false)
+                    .currentUser
+                    ?.id,
+            "desc": postDescription.text,
+            "title": title.text,
+            "imgs": imgPaths,
+            "last_seen": {
+              "location": lastSeenLocation.text,
+              "date": _lastSeenDate!.toIso8601String()
+            }
+          });
 
-        if (response != null) {
-          addEvent(CreatePostEvent(state: CreatePostEventState.success));
-          Navigator.pop(context, OnPopModel(reloadPrev: true));
+          if (response != null) {
+            addEvent(CreatePostEvent(state: CreatePostEventState.success));
+            Navigator.pop(context, OnPopModel(reloadPrev: true));
+          }
+        } on NetworkError catch (netErr) {
+          addEvent(CreatePostEvent(
+            state: CreatePostEventState.error,
+          ));
+          Dialogs.errorDialog(context, netErr.error);
         }
       } on NetworkError catch (netErr) {
         addEvent(CreatePostEvent(

@@ -11,9 +11,11 @@ import 'package:project_android/core/network/networkError.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/models/PostModel.dart';
+import 'package:project_android/modules/auth/authProvider.dart';
 import 'package:project_android/modules/base_provider.dart';
 import 'package:project_android/services/api.dart';
 import 'package:project_android/util/validators.dart';
+import 'package:provider/provider.dart';
 
 enum EditPostEventState { idle, loading }
 
@@ -53,7 +55,6 @@ class EditPostProvider extends BaseProvider<EditPostEvent> {
   }
 
   Api _api = sl<Api>();
-  AuthenticationBloc _authBloc = sl<AuthenticationBloc>();
 
   List<XFile>? _images = [];
   List<Uint8List> memImages = [];
@@ -103,33 +104,52 @@ class EditPostProvider extends BaseProvider<EditPostEvent> {
     notifyListeners();
   }
 
-  onSubmitPost(BuildContext context, String postId) async {
+  onSubmitPost(BuildContext context, String postId, String userId) async {
     if ((_images!.length + oldImages!.length) < 2) {
       Dialogs.errorDialog(context, "Please add 2 or more images");
       return;
     }
     if (formKey.currentState!.validate()) {
-      List<MultipartFile> files = [];
-      _images?.forEach((element) async {
-        files.add(MultipartFile.fromFileSync(element.path));
-      });
-
       addEvent(EditPostEvent(state: EditPostEventState.loading));
-
       try {
-        var response = await _api.editPost({
-          "userId": _authBloc.user?.id,
-          "status": status,
-          "desc": postDescription!.text,
-          "title": title!.text,
-          "imgs": oldImages,
-          "uploads": files,
-          "last_seen": {
-            "location": lastSeenLocation!.text,
-            "date": lastSeenDate!.toIso8601String()
-          }
-        }, postId);
-        if (response) Navigator.pop(context, OnPopModel(reloadPrev: true));
+        List<dynamic>? imgPaths = [];
+        List<MultipartFile> files = [];
+        if (_images!.isNotEmpty) {
+          _images?.forEach((element) async {
+            files.add(MultipartFile.fromFileSync(element.path));
+          });
+          imgPaths = await _api.uploadImages({"upload": files});
+          if (imgPaths == null) return;
+        }
+
+        if (oldImages!.length < post!.imgs!.length) {
+          List<String> oldImagesToDelete = [];
+          post!.imgs!.forEach((element) {
+            if (!oldImages!.contains(element)) oldImagesToDelete.add(element);
+          });
+
+          await _api.deleteImages(oldImagesToDelete);
+          post!.imgs!.forEach((element) {
+            if (oldImages!.contains(element)) oldImagesToDelete.add(element);
+          });
+        }
+        try {
+          var response = await _api.editPost({
+            "user_id": userId,
+            "status": status,
+            "id":postId,
+            "desc": postDescription!.text,
+            "title": title!.text,
+            "imgs": [...oldImages!, ...imgPaths],
+            "last_seen": {
+              "location": lastSeenLocation!.text,
+              "date": lastSeenDate!.toIso8601String()
+            }
+          }, postId);
+          if (response) Navigator.pop(context, OnPopModel(reloadPrev: true));
+        } on NetworkError catch (err) {
+          Dialogs.errorDialog(context, err.errorMessage!);
+        }
       } on NetworkError catch (err) {
         Dialogs.errorDialog(context, err.errorMessage!);
       }

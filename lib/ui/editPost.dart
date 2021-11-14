@@ -6,6 +6,7 @@ import 'package:project_android/components/buttons.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/PostModel.dart';
+import 'package:project_android/modules/auth/authProvider.dart';
 import 'package:project_android/modules/post/edit_post_Provider.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/themes/padding.dart';
@@ -35,7 +36,8 @@ class _EditPostState extends State<EditPost> with InputDec {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<EditPostProvider>(
         create: (context) => EditPostProvider(post: widget.post),
-        child: Consumer<EditPostProvider>(builder: (context, editPostProv, _) {
+        child: Consumer2<EditPostProvider, AuthenticationProvider>(
+            builder: (context, editPostProv, authProv, _) {
           return Scaffold(
             appBar: AppBar(
               title: Text("Edit Post"),
@@ -133,9 +135,7 @@ class _EditPostState extends State<EditPost> with InputDec {
                                                         index] is String)
                                                     ? DecorationImage(
                                                         image: NetworkImage(
-                                                            editPostProv
-                                                                    .displayImages[
-                                                                index]),
+                                                            "https://go-find-me.herokuapp.com/${editPostProv.displayImages[index]}"),
                                                         fit: BoxFit.cover)
                                                     : DecorationImage(
                                                         image: MemoryImage(
@@ -253,16 +253,6 @@ class _EditPostState extends State<EditPost> with InputDec {
                               controller: editPostProv.postDescription,
                               maxLines: 5,
                               decoration: inputDec(hint: "Post Description"),
-                              // decoration: InputDecoration(
-                              //   border: OutlineInputBorder(
-                              //     borderSide: BorderSide(
-                              //       color: Colors.grey,
-                              //       width: 1,
-                              //       style: BorderStyle.solid,
-                              //     ),
-                              //   ),
-                              //   hintText: "Post Description",
-                              // ),
                             ),
                             SizedBox(
                               height: 10,
@@ -282,10 +272,12 @@ class _EditPostState extends State<EditPost> with InputDec {
 
                             SizedBox(height: 10),
                             ThemeButton.longButtonPrim(
-                                text: "Edit Post",
+                                text: "Done",
                                 onpressed: () {
                                   editPostProv.onSubmitPost(
-                                      context, widget.post!.id!);
+                                      context,
+                                      widget.post!.id!,
+                                      authProv.currentUser!.id!);
                                 }),
                           ],
                         ),

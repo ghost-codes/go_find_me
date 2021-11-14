@@ -10,6 +10,7 @@ import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/models/PostModel.dart';
+import 'package:project_android/modules/auth/authProvider.dart';
 import 'package:project_android/modules/post/dashboard_provider.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/themes/dropShadows.dart';
@@ -31,8 +32,6 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
-  AuthenticationBloc authBloc = sl<AuthenticationBloc>();
-
   @override
   void initState() {
     // Provider.of<DashboardProvider>(context, listen: false).getFeedBody();
@@ -52,7 +51,6 @@ class _DashboardViewState extends State<DashboardView> {
               OnPopModel? onPopModel = await Navigator.push(context,
                   MaterialPageRoute(builder: (context) => CreatePostView()));
               if (onPopModel != null && onPopModel.reloadPrev) {
-                print("hell");
                 dashboardProv.getFeedBody();
               }
             },
@@ -117,7 +115,6 @@ class _DashboardViewState extends State<DashboardView> {
                                   ...List.generate(
                                     dashboardProv.currentData!.length,
                                     (index) => PostCard(
-                                      authBloc: authBloc,
                                       post: dashboardProv.currentData![index]!,
                                     ),
                                   ),
@@ -140,11 +137,8 @@ class _DashboardViewState extends State<DashboardView> {
 class PostCard extends StatefulWidget {
   const PostCard({
     Key? key,
-    required this.authBloc,
     required this.post,
   }) : super(key: key);
-
-  final AuthenticationBloc authBloc;
 
   final Post post;
 
@@ -179,7 +173,10 @@ class _PostCardState extends State<PostCard> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                widget.post.userId == widget.authBloc.user?.id
+                widget.post.userId ==
+                        Provider.of<AuthenticationProvider>(context)
+                            .currentUser
+                            ?.id
                     ? InkWell(
                         onTap: () async {
                           OnPopModel res = await showDialog(
@@ -294,7 +291,10 @@ class _PostCardState extends State<PostCard> {
             Container(
               // height: 50,
               padding: EdgeInsets.all(ThemePadding.padBase),
-              child: widget.post.userId == widget.authBloc.user?.id
+              child: widget.post.userId ==
+                      Provider.of<AuthenticationProvider>(context)
+                          .currentUser
+                          ?.id
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -397,7 +397,6 @@ class _PostCardState extends State<PostCard> {
                                 );
                               }));
                               if (onPopModel != null && onPopModel.reloadPrev) {
-                                print("hell");
                                 dashboardProv.getFeedBody();
                               }
                             }
@@ -461,13 +460,13 @@ class _PostOptionsDialogState extends State<PostOptionsDialog> {
               ListTile(
                 title: Text("Edit Post"),
                 onTap: () async {
-                  bool res = await Navigator.push(context,
+                  OnPopModel res = await Navigator.push(context,
                       MaterialPageRoute(builder: (context) {
                     return EditPost(
                       post: widget.post,
                     );
-                  })) as bool;
-                  if (res) Navigator.of(context).pop(true);
+                  })) ;
+                  if (res.reloadPrev) Navigator.of(context).pop(OnPopModel(reloadPrev: true));
                 },
               ),
               ListTile(
@@ -635,7 +634,7 @@ class ImagesLogic extends StatelessWidget {
             borderRadius: ThemeBorderRadius.smallRadiusAll,
             image: DecorationImage(
                 image: NetworkImage(
-                  src,
+                  "https://go-find-me.herokuapp.com/$src",
                 ),
                 fit: BoxFit.cover)),
       ),
@@ -679,7 +678,8 @@ class DisplayImages extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: ThemeBorderRadius.smallRadiusAll,
                     image: DecorationImage(
-                      image: NetworkImage(images![index]),
+                      image: NetworkImage(
+                          "https://go-find-me.herokuapp.com/${images![index]}"),
                     ),
                   ),
                 );

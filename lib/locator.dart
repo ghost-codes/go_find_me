@@ -12,6 +12,5 @@ setuplocator() {
   sl.registerLazySingleton(() => Api());
   sl.registerLazySingleton(() => PlacesService());
   sl.registerLazySingleton(() => SharedPreferencesService());
-  sl.registerLazySingleton(() => AuthenticationBloc());
   sl.registerFactory(() => ContributionBloc());
 }

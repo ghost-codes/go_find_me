@@ -46,12 +46,12 @@ class Post {
         status: json["status"],
         shares: json["shares"],
         id: json["_id"],
-        userId: json["userId"],
+        userId: json["user_id"],
         desc: json["desc"],
         title: json["title"],
         lastSeen: LastSeen.fromJson(json["last_seen"]),
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
         v: json["__v"],
       );
 

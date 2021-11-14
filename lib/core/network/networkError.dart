@@ -8,6 +8,7 @@ class NetworkError implements Exception {
   }
 
   String? errorMessage;
+  int? statusCode;
 
   onDioError(DioError error) {
     switch (error.type) {
@@ -27,14 +28,29 @@ class NetworkError implements Exception {
         errorMessage = 'Error: Response Timeout';
         break;
       case DioErrorType.response:
-        if (error.response?.statusCode == 500)
-          errorMessage = 'Error: Server Error';
-        else
-          errorMessage = 'Unexpected: Server Error';
+        reponseponseErrorTypeHandler(error);
         break;
       default:
         errorMessage = 'Error: Unexpected Error';
     }
+  }
+
+  void reponseponseErrorTypeHandler(DioError err) {
+    switch (err.response?.statusCode) {
+      case 500:
+        errorMessage = 'Error: Server Error';
+        break;
+      case 403:
+        errorMessage = 'Error: Unauthorized credentials';
+        break;
+
+      case 401:
+        errorMessage = err.response!.data["message"];
+        break;
+      default:
+        errorMessage = 'Unexpected: Server Error';
+    }
+    statusCode = err.response?.statusCode;
   }
 
   String get error {
