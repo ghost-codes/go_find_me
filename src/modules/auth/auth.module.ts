@@ -9,9 +9,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constant';
 import * as bcrypt from 'bcrypt';
 import { JwtStrategy } from './strategies/jwt.strategies';
+import { EmailConfirmationService } from './emailconfirmation.service';
+import { PhoneConfirmationService } from './phonenumberConfirmation.service';
+import { SmsService } from '../sms/sms.service';
+import { SmsModule } from '../sms/sms.module';
 
 @Module({
   imports: [
+    SmsService,
     MongooseModule.forFeatureAsync([
       {
         name: User.name,
@@ -34,8 +39,15 @@ import { JwtStrategy } from './strategies/jwt.strategies';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '2h' },
     }),
+    SmsModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    EmailConfirmationService,
+    PhoneConfirmationService,
+  ],
 })
 export class AuthModule {}

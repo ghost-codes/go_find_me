@@ -11,8 +11,11 @@ export class User extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
+  @Prop({ unique: true, maxlength: 13 })
+  phone_number: string;
+
   @Prop({ default: null })
-  google_id: string;
+  confirmed_at: Date;
 
   @Prop({ required: true })
   password: string;
