@@ -8,6 +8,7 @@ import 'package:project_android/models/UserModel.dart';
 import 'package:project_android/modules/base_provider.dart';
 import 'package:project_android/services/api.dart';
 import 'package:project_android/services/sharedPref.dart';
+import 'package:project_android/ui/baseAuth_view.dart';
 import 'package:project_android/ui/home_view.dart';
 import 'package:project_android/ui/login_view.dart';
 
@@ -42,7 +43,7 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
 
     if (userJson.isEmpty) {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Login()));
+          context, MaterialPageRoute(builder: (context) => BaseAuthView()));
     } else {
       currentUser = UserModel.fromJson(userJson);
       Navigator.pushReplacement(

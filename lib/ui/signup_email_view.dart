@@ -13,8 +13,8 @@ import 'package:project_android/themes/theme_colors.dart';
 import 'package:project_android/ui/login_view.dart';
 import 'package:provider/provider.dart';
 
-class SignUp extends StatelessWidget with InputDec {
-  SignUp({Key? key}) : super(key: key);
+class SignUpEmail extends StatelessWidget with InputDec {
+  SignUpEmail({Key? key}) : super(key: key);
 
   GlobalKey _scaffold = GlobalKey();
 

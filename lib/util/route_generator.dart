@@ -6,7 +6,7 @@ import 'package:project_android/ui/home_view.dart';
 import 'package:project_android/ui/login_view.dart';
 import 'package:project_android/ui/result_map_view.dart';
 import 'package:project_android/ui/rootView.dart';
-import 'package:project_android/ui/signup_view.dart';
+import 'package:project_android/ui/signup_email_view.dart';
 import 'package:project_android/ui/splash_view.dart';
 
 class RouteGenerator {
@@ -24,7 +24,7 @@ class RouteGenerator {
       case "/login":
         return MaterialPageRoute(builder: (context) => Login());
       case "/signup":
-        return MaterialPageRoute(builder: (context) => SignUp());
+        return MaterialPageRoute(builder: (context) => SignUpEmail());
       case "/edit_post":
         final post = setting.arguments as Post;
         return MaterialPageRoute(
