@@ -63,10 +63,8 @@ class ThemeButton {
     );
   }
 
-  static Widget ButtonSec(
-      {String? text, VoidCallback? onpressed, double? width}) {
+  static Widget ButtonSec({String? text, VoidCallback? onpressed,double? width}) {
     return Container(
-      width: width,
       decoration: BoxDecoration(
           color: ThemeColors.white,
           borderRadius: ThemeBorderRadius.smallRadiusAll,

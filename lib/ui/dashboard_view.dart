@@ -465,9 +465,8 @@ class _PostOptionsDialogState extends State<PostOptionsDialog> {
                     return EditPost(
                       post: widget.post,
                     );
-                  }));
-                  if (res.reloadPrev)
-                    Navigator.of(context).pop(OnPopModel(reloadPrev: true));
+                  })) ;
+                  if (res.reloadPrev) Navigator.of(context).pop(OnPopModel(reloadPrev: true));
                 },
               ),
               ListTile(
@@ -699,10 +698,10 @@ class AppBarWidget extends StatelessWidget with InputDec {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        IconButton(
-            icon: Icon(Icons.menu),
-            color: ThemeColors.primary,
-            onPressed: () {}),
+        Icon(
+          Icons.menu,
+          color: ThemeColors.primary,
+        ),
         Expanded(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 25),
