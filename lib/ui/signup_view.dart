@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_android/blocs/authenticationBloc.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:project_android/components/passwordTextField.dart';
 import 'package:project_android/components/text_fields.dart';
-import 'package:project_android/locator.dart';
 import 'package:project_android/modules/auth/authProvider.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/components/buttons.dart';
@@ -66,7 +65,7 @@ class SignUp extends StatelessWidget with InputDec {
                           )
                         : Container(
                             // height: 620,
-                            padding: EdgeInsets.all(2.5 * ThemePadding.padBase),
+                            padding: EdgeInsets.all(2 * ThemePadding.padBase),
                             decoration: BoxDecoration(
                               color: ThemeColors.white,
                               borderRadius: ThemeBorderRadius.bigRadiusAll,
@@ -119,16 +118,34 @@ class SignUp extends StatelessWidget with InputDec {
           children: [
             TextFormField(
               controller: authProv.signUpUsername,
-              decoration: inputDec(hint: "Username"),
+              decoration: inputDec(hint: "Username*"),
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             TextFormField(
               controller: authProv.singupEmail,
-              decoration: inputDec(hint: "Email"),
+              decoration: inputDec(hint: "Email*"),
+            ),
+            SizedBox(height: 2 * ThemePadding.padBase),
+            Container(
+              decoration: BoxDecoration(
+                color: ThemeColors.primary.withOpacity(0.07),
+                borderRadius: ThemeBorderRadius.smallRadiusAll,
+              ),
+              child: InternationalPhoneNumberInput(
+                  inputDecoration: inputDec(hint: "Phone number"),
+                  ignoreBlank: true,
+                  spaceBetweenSelectorAndTextField: 2,
+                  keyboardType: TextInputType.number,
+                  selectorConfig: SelectorConfig(
+                      leadingPadding: 0,
+                      showFlags: false,
+                      selectorType: PhoneInputSelectorType.DIALOG),
+                  maxLength: 11,
+                  onInputChanged: (PhoneNumber phoneNumber) {}),
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             PasswordTextField(
-              inputDec: inputDec(hint: "Password"),
+              inputDec: inputDec(hint: "Password*"),
               controller: authProv.signUpPassword,
             ),
             SizedBox(height: 2 * ThemePadding.padBase),

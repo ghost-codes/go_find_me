@@ -3,11 +3,8 @@ import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:flutter/material.dart';
-import 'package:project_android/blocs/authenticationBloc.dart';
-
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/components/text_fields.dart';
-import 'package:project_android/locator.dart';
 import 'package:project_android/models/OnPopModel.dart';
 import 'package:project_android/models/PostModel.dart';
 import 'package:project_android/modules/auth/authProvider.dart';
@@ -42,8 +39,25 @@ class _DashboardViewState extends State<DashboardView> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => DashboardProvider(rootContext: context),
-      child: Consumer<DashboardProvider>(builder: (context, dashboardProv, _) {
+      child: Consumer2<DashboardProvider, AuthenticationProvider>(
+          builder: (context, dashboardProv, authProv, _) {
         return Scaffold(
+          drawer: Drawer(
+            child: ListView(
+              children: [
+                ListTile(
+                  title: Text(
+                    "Logout",
+                    style: ThemeTexTStyle.regularPrim,
+                  ),
+                  onTap: () {
+                    Scaffold.of(context).openDrawer();
+                    authProv.logOut(context);
+                  },
+                )
+              ],
+            ),
+          ),
           floatingActionButton: FloatingActionButton(
             focusColor: ThemeColors.primary,
             child: Icon(Icons.add),
@@ -465,8 +479,9 @@ class _PostOptionsDialogState extends State<PostOptionsDialog> {
                     return EditPost(
                       post: widget.post,
                     );
-                  })) ;
-                  if (res.reloadPrev) Navigator.of(context).pop(OnPopModel(reloadPrev: true));
+                  }));
+                  if (res.reloadPrev)
+                    Navigator.of(context).pop(OnPopModel(reloadPrev: true));
                 },
               ),
               ListTile(
@@ -698,9 +713,12 @@ class AppBarWidget extends StatelessWidget with InputDec {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Icon(
-          Icons.menu,
+        IconButton(
+          icon: Icon(Icons.menu),
           color: ThemeColors.primary,
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
         ),
         Expanded(
           child: Container(
@@ -764,7 +782,8 @@ class Contribute extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: ThemeBorderRadius.smallRadiusAll,
                       image: DecorationImage(
-                        image: NetworkImage(images![index]),
+                        image: NetworkImage(
+                            "https://go-find-me.herokuapp.com/${images![index]}"),
                       ),
                     ),
                   );

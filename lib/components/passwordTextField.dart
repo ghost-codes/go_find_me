@@ -3,10 +3,12 @@ import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/themes/theme_colors.dart';
 
 class PasswordTextField extends StatefulWidget {
-  const PasswordTextField({Key? key, this.controller, this.inputDec})
+  const PasswordTextField(
+      {Key? key, this.controller, this.inputDec, this.validator})
       : super(key: key);
   final TextEditingController? controller;
   final InputDecoration? inputDec;
+  final String? Function(String?)? validator;
 
   @override
   _PasswordTextFieldState createState() => _PasswordTextFieldState();
@@ -19,16 +21,18 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   Widget build(BuildContext context) {
     return Container(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: TextFormField(
+              validator: widget.validator,
               controller: widget.controller,
               decoration: widget.inputDec,
               obscureText: obscureText,
             ),
           ),
           Container(
-            padding: EdgeInsets.all(3),
+            padding: EdgeInsets.symmetric(horizontal: 3, vertical: 5),
             decoration: BoxDecoration(
                 color: ThemeColors.primary.withOpacity(0.1),
                 borderRadius: ThemeBorderRadius.smallRadiusAll),

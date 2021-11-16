@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project_android/blocs/authenticationBloc.dart';
-import 'package:project_android/components/buttons.dart';
-import 'package:project_android/locator.dart';
 import 'package:project_android/modules/auth/authProvider.dart';
 import 'package:project_android/themes/theme_colors.dart';
-import 'package:project_android/ui/login_view.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
