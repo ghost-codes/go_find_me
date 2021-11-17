@@ -55,7 +55,11 @@ export class AuthService {
 
   async emailLogin(loginDTO: LoginEmailDTO): Promise<any> {
     const user: User = await this.userModel.findOne({
-      $or: [{ username: loginDTO.identity }, { email: loginDTO.identity }],
+      $or: [
+        { username: loginDTO.identity },
+        { email: loginDTO.identity },
+        { phone_number: loginDTO.identity },
+      ],
     });
 
     if (!user) throw new UnauthorizedException('Invalid email or password');

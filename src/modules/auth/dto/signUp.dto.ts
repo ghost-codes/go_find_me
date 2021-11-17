@@ -8,5 +8,8 @@ export class SignUpDTO {
   password: string;
 
   @ApiProperty()
+  phone_number: string;
+
+  @ApiProperty()
   username: string;
 }
