@@ -8,6 +8,7 @@ export interface UserReponseModel {
   id?: string;
   username: string;
   email: string;
+  phone_number: string;
 }
 
 export interface AuthenticationResponse {

@@ -68,7 +68,14 @@ export class EmailConfirmationService {
     await this.userModel.findByIdAndUpdate(user.id, {
       confirmed_at: new Date(Date.now()),
     });
-    return await this.userModel.findById(user.id);
+    const updatedUser: User = await this.userModel.findById(user.id);
+    return {
+      id: updatedUser.id,
+      phone_number: updatedUser.phone_number,
+      confirmed_at: updatedUser.confirmed_at,
+      email: updatedUser.email,
+      username: updatedUser.username,
+    };
   }
 
   async verifyConfirmationToken(token: string): Promise<string> {
