@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 class NetworkError implements Exception {
   NetworkError(DioError error) {
+    print(error);
     onDioError(error);
   }
 
@@ -48,7 +49,7 @@ class NetworkError implements Exception {
         errorMessage = err.response!.data["message"];
         break;
       default:
-        errorMessage = 'Unexpected: Server Error';
+        errorMessage = err.response!.data["message"];
     }
     statusCode = err.response?.statusCode;
   }

@@ -41,11 +41,22 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
 
   bool isPhoneLogin = false;
 
+  
+
   setLoginPhoneNumber(PhoneNumber phone) {
     loginPhoneNumber = phone;
   }
 
+  _disposeContollers(){
+   loginEmail.clear();
+   loginPassworrd.clear();
+   signUpPassword.clear();
+   singupEmail.clear();
+   signUpUsername.clear(); 
+  }
+
   setIsPhoneLogin() {
+    
     isPhoneLogin = !isPhoneLogin;
     notifyListeners();
   }
@@ -63,8 +74,14 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
           context, MaterialPageRoute(builder: (context) => Login()));
     } else {
       currentUser = UserModel.fromJson(userJson);
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomeView()));
+      if (currentUser!.confirmedAt == null) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => VerifyAccount()));
+      } else {
+        _disposeContollers();
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomeView()));
+      }
     }
   }
 
@@ -93,12 +110,13 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
           addEvent(AuthEvent(state: AuthEventState.success));
 
           if (currentUser!.confirmedAt != null)
+          {_disposeContollers();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => HomeView(),
               ),
-            );
+            );}
           else
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => VerifyAccount()));

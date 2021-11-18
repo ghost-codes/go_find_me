@@ -17,6 +17,9 @@ class Api {
   Dio dio = Dio(
     BaseOptions(
       baseUrl: 'https://go-find-me.herokuapp.com/api',
+      validateStatus: (status){
+        return status! <= 300;
+      }
     ),
   );
 
@@ -25,20 +28,18 @@ class Api {
         .add(InterceptorsWrapper(onRequest: (request, handler) async {
       String? token = await sharedPref.getStringValuesSF("accessToken");
       if (token != null && token != '') {
-        print(token);
         request.headers['Authorization'] = "Bearer " + token;
       }
       return handler.next(request);
     }, onError: (DioError e, handler) async {
       if (e.response?.statusCode == 401) {
-     
         try {
           String? refreshToken =
               await sharedPref.getStringValuesSF("refreshToken");
 
           if (refreshToken != null && refreshToken != '') {
-            await dio.post('/auth/refresh', data: {"refreshToken": refreshToken}).then(
-                (value) async {
+            await dio.post('/auth/refresh',
+                data: {"refreshToken": refreshToken}).then((value) async {
               if (value.statusCode == 201) {
                 String token = value.data["accessToken"];
                 await sharedPref.addStringToSF(
@@ -90,7 +91,7 @@ class Api {
   Future<UserModel?> emailLogin(Map<String, dynamic> map) async {
     try {
       Response response = await dio.post('/auth/login/email/', data: map);
-
+      print(response.data?["user"]);
       UserModel user = UserModel.fromJson(response.data?["user"] ?? {});
       await sharedPref.addStringToSF(
           "accessToken", response.data?["accessToken"]);
@@ -116,6 +117,56 @@ class Api {
       return user;
     } on DioError catch (err) {
       throw NetworkError(err);
+    }
+  }
+
+  Future<void> sendOTPemail(Map<String, dynamic> map) async {
+    try {
+      Response<Map<String, dynamic>> response =
+          await dio.post("/auth/email/send_otp", data: map);
+
+      await sharedPref.addStringToSF(
+          "confirmation_token", response.data!["confirmation_token"]);
+    } on DioError catch (error) {
+      throw new NetworkError(error);
+    }
+  }
+
+  Future<UserModel> confirmEmail(Map<String, dynamic> map) async {
+    try {
+      Response<Map<String, dynamic>> response =
+          await dio.post("/auth/confirm_email", data: map);
+      await sharedPref.removeFromSF("confirmation_token");
+      print(response.data);
+      UserModel user = UserModel.fromJson(response.data ?? {});
+      return user;
+    } on DioError catch (error) {
+      throw new NetworkError(error);
+    }
+  }
+
+  Future<void> sendOTPPhone(Map<String, dynamic> map) async {
+    try {
+      Response<Map<String, dynamic>> response =
+          await dio.post("/auth/phone-number/send_otp", data: map);
+
+      await sharedPref.addStringToSF(
+          "confirmation_token", response.data!["confirmation_token"]);
+    } on DioError catch (error) {
+      throw new NetworkError(error);
+    }
+  }
+
+  Future<UserModel> confirmPhone(Map<String, dynamic> map) async {
+    try {
+      Response<Map<String, dynamic>> response =
+          await dio.post("/auth/confirm_phone", data: map);
+      await sharedPref.removeFromSF("confirmation_token");
+      print(response.data);
+      UserModel user = UserModel.fromJson(response.data ?? {});
+      return user;
+    } on DioError catch (error) {
+      throw new NetworkError(error);
     }
   }
 
@@ -148,7 +199,7 @@ class Api {
   editPost(Map<String, dynamic> map, String postId) async {
     try {
       print(map);
-          Response response = await dio.put("/post/$postId", data: map);
+      Response response = await dio.put("/post/$postId", data: map);
 
       return true;
     } on DioError catch (err) {
