@@ -9,6 +9,7 @@ export interface UserReponseModel {
   username: string;
   email: string;
   phone_number: string;
+  confirmed_at: Date;
 }
 
 export interface AuthenticationResponse {
