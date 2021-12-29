@@ -15,12 +15,12 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
     ConfigModule.forRoot(),
     MailerModule.forRoot({
       transport: {
-        host: 'email-smtp.us-east-2.amazonaws.com',
+        host: 'smtp.sendgrid.net',
         port: 587,
         secure: false,
         auth: {
-          user: process.env.AWS_SES_USER,
-          pass: process.env.AWS_SES_PASS,
+          user: 'apikey',
+          pass: process.env.SENDGRID_APIKEY_PASS,
         },
       },
       defaults: {

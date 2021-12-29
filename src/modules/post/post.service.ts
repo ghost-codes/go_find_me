@@ -29,10 +29,25 @@ export class PostService {
     private readonly contributionModel: Model<ContributionDocument>,
   ) {}
 
-  async getPosts(): Promise<Post[]> {
-    const post: Post[] = await this.postModel.find();
-    if (!post) return [];
-    return post;
+  async getPosts(page: number): Promise<any> {
+    if (!page) page = 0;
+    const posts: Post[] = await this.postModel
+      .find()
+      .sort({ _id: -1 })
+      .skip(page * 20)
+      .limit(20);
+
+    if (!posts)
+      return { posts: [], next: null, prev: `/api/post/page=${page}` };
+    if (posts.length < 20)
+      return { posts, next: null, prev: `/api/post/page=${page}` };
+
+    let next: number = page;
+    return {
+      posts,
+      next: `/api/post/?page=${++next}`,
+      prev: `/api/post/?page=${page}`,
+    };
   }
 
   async createPost(createPost: CreatePost): Promise<Post> {

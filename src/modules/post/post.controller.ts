@@ -8,6 +8,7 @@ import {
   Put,
   Delete,
   Param,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guard/jwt.guard';
 import { CreatePostDTO } from './dto/createPost.dto';
@@ -19,10 +20,15 @@ import { PostService } from './post.service';
 export class PostController {
   constructor(private postService: PostService) {}
 
-  @Get()
-  getAllPosts(): Promise<any> {
-    return this.postService.getPosts();
+  @Get('?')
+  getAllPosts(@Query('page') page: number): Promise<any> {
+    return this.postService.getPosts(page);
   }
+
+  // @Get('page?')
+  // getPostsPerPage(@Query('page') page: number): Promise<any> {
+  //   return this.postService.getPosts(page);
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Post()

@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import {
   AuthenticationResponse,
   UserReponseModel,
@@ -11,6 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserSession } from './interfaces/userSession.interface';
 import { LoginEmailDTO } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -32,8 +37,13 @@ export class AuthService {
     return null;
   }
 
+  async validatePassHash(passHash: string, email: string): Promise<boolean> {
+    const user = await this.userModel.findOne({ email: email });
+    return passHash === user.passHash;
+  }
+
   async emailSignup(signUpDto: SignUpDTO): Promise<any> {
-    const newUser = new this.userModel(signUpDto);
+    const newUser = new this.userModel({ ...signUpDto, passHash: uuidv4() });
     const savedUser = await newUser.save();
     const userResponse: UserReponseModel = savedUser;
 
@@ -53,6 +63,28 @@ export class AuthService {
     };
     console.log(response);
     return response;
+  }
+
+  async changePassword(
+    newPassword: string,
+    email: string,
+    hash: string,
+  ): Promise<any> {
+    const user: User = await this.userModel.findOne({ email: email });
+    if (hash !== user.passHash)
+      throw new UnauthorizedException('Please provide correct parameters');
+
+    bcrypt.hash(newPassword, 10).then((value) => {
+      user.password = value;
+    });
+
+    const updatedUser: User = await this.userModel.findByIdAndUpdate(
+      user.id,
+      user,
+    );
+    if (!updatedUser)
+      throw new InternalServerErrorException('Something went wrong');
+    return { message: 'Password change was successful' };
   }
 
   async emailLogin(loginDTO: LoginEmailDTO): Promise<any> {
@@ -109,14 +141,22 @@ export class AuthService {
   }
 
   async generateAccessToken(user: any) {
-    const payload = { username: user.username, sub: user.id };
+    const payload = {
+      username: user.username,
+      sub: user.id,
+      passHash: user.passHash,
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
   async generateRefreshToken(user: User) {
-    const payload = { username: user.username, sub: user.id };
+    const payload = {
+      username: user.username,
+      sub: user.id,
+      passHash: user.passHash,
+    };
     return {
       refresh_token: this.jwtService.sign(payload, { expiresIn: '500d' }),
     };

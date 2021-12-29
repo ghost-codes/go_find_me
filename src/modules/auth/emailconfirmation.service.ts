@@ -12,6 +12,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Confirm } from './interfaces/confirm.interface';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class EmailConfirmationService {
@@ -34,21 +35,60 @@ export class EmailConfirmationService {
     return confirmation_token;
   }
 
+  async sendForgotPasswordCode(email: string): Promise<any> {
+    const user: User = await this.userModel.findOne({ email: email });
+
+    if (!user) throw new NotFoundException('User does not exist');
+    const forgot_password_code = await this.generateConfirmaToken({
+      email: email,
+    });
+
+    const otp = notp.totp.gen(forgot_password_code.confirmation_token, {
+      time: 600,
+    });
+    await this.sendVerificationEmail(user, otp);
+    return forgot_password_code;
+  }
+
   async sendVerificationEmail(user: User, otp: string): Promise<void> {
     await this.mailerService
       .sendMail({
         to: user.email,
-        from: process.env.EMAIL_SENDER,
-        subject: 'Testing',
+        subject: 'Verify Email (GoFindMe)',
         text: otp,
         template: 'dist/src/templates/emailconfirmation',
         context: { name: user.username, code: otp },
       })
-      .then(() => {})
+      .then(() => {
+        console.log('');
+      })
       .catch((e) => {
         console.log(e);
         throw new InternalServerErrorException();
       });
+  }
+
+  async verifyForgotPasswordCode(forgotPassCode: Confirm) {
+    const payload = await this.verifyConfirmationToken(
+      forgotPassCode.confirmation_token,
+    );
+    const user: User = await this.userModel.findOne({ email: payload });
+    if (!user) throw new NotFoundException('User not found');
+    const is_verified = notp.totp.verify(
+      forgotPassCode.otp,
+      forgotPassCode.confirmation_token,
+      { time: 600 },
+    );
+    if (!is_verified) throw new UnauthorizedException('Wrong passcode');
+
+    user.passHash = uuidv4();
+    const updatedUser: User = await this.userModel.findByIdAndUpdate(
+      user.id,
+      user,
+    );
+    if (!updatedUser)
+      throw new InternalServerErrorException('Something went wrong');
+    return { message: 'Correct Passcode', hash: user.passHash };
   }
 
   async confirmUser(confirmEmail: Confirm) {
