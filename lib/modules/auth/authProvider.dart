@@ -70,7 +70,6 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
   }
 
   getStoredUser(BuildContext context) async {
-    await _sharedPref.removeFromSF("currentUser");
     Map<String, dynamic> userJson = json
         .decode((await _sharedPref.getStringValuesSF("currentUser")) ?? "{}");
     if (userJson.isEmpty) {
