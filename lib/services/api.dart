@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:project_android/core/network/networkError.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/PostModel.dart';
+import 'package:project_android/models/PostQueryResponse.dart';
 import 'package:project_android/models/UserModel.dart';
 import 'package:project_android/services/sharedPref.dart';
 
@@ -228,13 +229,16 @@ class Api {
     }
   }
 
-  Future<List<Post?>> getFeed() async {
+  Future<PostQueryResponse> getFeed() async {
     try {
-      Response response = await dio.get("/post/");
+      Response<Map<String,dynamic>> response = await dio.get("/post/");
 
-      List resultData = response.data;
-      List<Post?> posts = resultData.map((e) => Post.fromJson(e)).toList();
-      return posts;
+      Map<String,dynamic > resultData = response.data!;
+
+
+     PostQueryResponse postQueryResponse = PostQueryResponse.fromJson(resultData);
+      List<Post?>? posts;
+      return postQueryResponse;
     } on DioError catch (err) {
       throw NetworkError(err);
     }

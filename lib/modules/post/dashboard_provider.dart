@@ -3,6 +3,7 @@ import 'package:project_android/components/dialogs.dart';
 import 'package:project_android/core/network/networkError.dart';
 import 'package:project_android/locator.dart';
 import 'package:project_android/models/PostModel.dart';
+import 'package:project_android/models/PostQueryResponse.dart';
 import 'package:project_android/modules/base_provider.dart';
 import 'package:project_android/services/api.dart';
 
@@ -26,17 +27,20 @@ class DashboardProvider extends BaseProvider<DashBoardEvent> {
   Api _api = sl<Api>();
   bool reload = false;
   List<Post?>? currentData;
+  String? nextPostPage;
 
   getFeedBody() async {
     addEvent(DashBoardEvent(state: DashBoardEventState.isloading));
 
     try {
-      List<Post?> response = await _api.getFeed();
+      PostQueryResponse response = await _api.getFeed();
+      currentData = response.posts;
+      nextPostPage = response.next;
       if (response == null) {
         addEvent(DashBoardEvent(state: DashBoardEventState.error));
         return;
       }
-      currentData = response.reversed.toList();
+    
       addEvent(DashBoardEvent(state: DashBoardEventState.success));
     } on NetworkError catch (netErr) {
       addEvent(DashBoardEvent(state: DashBoardEventState.error));
