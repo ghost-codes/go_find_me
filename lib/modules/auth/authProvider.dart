@@ -36,27 +36,30 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
   TextEditingController signUpPassword = TextEditingController();
   TextEditingController singupEmail = TextEditingController();
   TextEditingController signUpUsername = TextEditingController();
+  PhoneNumber? signUpPhoneNumber;
 
   GlobalKey<FormState> loginEmailFormKey = GlobalKey();
+  GlobalKey<FormState> signUpEmailFormKey = GlobalKey();
 
   bool isPhoneLogin = false;
-
-  
 
   setLoginPhoneNumber(PhoneNumber phone) {
     loginPhoneNumber = phone;
   }
 
-  _disposeContollers(){
-   loginEmail.clear();
-   loginPassworrd.clear();
-   signUpPassword.clear();
-   singupEmail.clear();
-   signUpUsername.clear(); 
+  setSignupPhoneNumber(PhoneNumber phone) {
+    signUpPhoneNumber = phone;
+  }
+
+  _disposeContollers() {
+    loginEmail.clear();
+    loginPassworrd.clear();
+    signUpPassword.clear();
+    singupEmail.clear();
+    signUpUsername.clear();
   }
 
   setIsPhoneLogin() {
-    
     isPhoneLogin = !isPhoneLogin;
     notifyListeners();
   }
@@ -67,6 +70,7 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
   }
 
   getStoredUser(BuildContext context) async {
+    await _sharedPref.removeFromSF("currentUser");
     Map<String, dynamic> userJson = json
         .decode((await _sharedPref.getStringValuesSF("currentUser")) ?? "{}");
     if (userJson.isEmpty) {
@@ -109,15 +113,15 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
               "currentUser", json.encode(result.toJson()));
           addEvent(AuthEvent(state: AuthEventState.success));
 
-          if (currentUser!.confirmedAt != null)
-          {_disposeContollers();
+          if (currentUser!.confirmedAt != null) {
+            _disposeContollers();
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => HomeView(),
               ),
-            );}
-          else
+            );
+          } else
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => VerifyAccount()));
         }
@@ -160,6 +164,7 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
     try {
       UserModel? result = await _api.emailSignUp({
         "username": signUpUsername.text,
+        "phone_number": signUpPhoneNumber?.phoneNumber ?? "",
         "password": signUpPassword.text,
         "email": singupEmail.text,
       });
@@ -171,7 +176,7 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeView(),
+            builder: (context) => VerifyAccount(),
           ),
         );
       }

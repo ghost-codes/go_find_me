@@ -114,16 +114,18 @@ class SignUp extends StatelessWidget with InputDec {
   Widget signup() {
     return Consumer<AuthenticationProvider>(builder: (context, authProv, _) {
       return Form(
+        key: authProv.signUpEmailFormKey,
         child: Column(
           children: [
             TextFormField(
               controller: authProv.signUpUsername,
               decoration: inputDec(hint: "Username*"),
+              validator: (val){return authProv.isEmptyValidator(val!);},
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             TextFormField(
               controller: authProv.singupEmail,
-              decoration: inputDec(hint: "Email*"),
+              decoration: inputDec(hint: "Email*"),validator: (val){return authProv.isEmptyValidator(val!);},
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             Container(
@@ -141,17 +143,18 @@ class SignUp extends StatelessWidget with InputDec {
                       showFlags: false,
                       selectorType: PhoneInputSelectorType.DIALOG),
                   maxLength: 11,
-                  onInputChanged: (PhoneNumber phoneNumber) {}),
+                  onInputChanged: authProv.setSignupPhoneNumber),
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             PasswordTextField(
               inputDec: inputDec(hint: "Password*"),
-              controller: authProv.signUpPassword,
+              controller: authProv.signUpPassword,validator: (val){return authProv.isEmptyValidator(val!);},
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             TextFormField(
               autovalidateMode: AutovalidateMode.always,
               validator: (value) {
+                  
                 return authProv.passwordValidate(
                     value, authProv.signUpPassword);
               },
@@ -162,8 +165,9 @@ class SignUp extends StatelessWidget with InputDec {
             ThemeButton.longButtonPrim(
               text: "Sign Up",
               onpressed: () {
+                if(authProv.signUpEmailFormKey.currentState!.validate())
                 authProv.emailSignup(_scaffold.currentContext!);
-                // Navigator.pushReplacementNamed(_scaffold.currentContext!, '/');
+            
               },
             ),
           ],

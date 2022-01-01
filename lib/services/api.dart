@@ -106,6 +106,7 @@ class Api {
 
   Future<UserModel?> emailSignUp(Map<String, dynamic> data) async {
     try {
+      print(data);
       Response response = await dio.post('/auth/sign_up/email', data: data);
 
       UserModel user = UserModel.fromJson(response.data?["user"] ?? {});

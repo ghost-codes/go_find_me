@@ -24,12 +24,7 @@ class GoFindMeApp extends StatelessWidget {
           primaryColor: ThemeColors.primary,
         ),
         home: SplashScreen(),
-        // initialRoute: "/",
-        // routes: {
-        //   "/": (context) => SplashScreen(),
-        //   "/login": (context) => Login()
-        // },
-        // onGenerateRoute: RouteGenerator.generateRoute,
+      
       ),
     );
   }
