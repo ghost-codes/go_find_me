@@ -21,12 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(Duration(milliseconds: 1500), () {});
   }
 
-  // @override
-  // void initState() {
-  //   Provider.of<AuthenticationProvider>(context, listen: false)
-  //       .tokenAuthentication(context);
-  //   super.initState();
-  // }
+
 
   @override
   void dispose() {
