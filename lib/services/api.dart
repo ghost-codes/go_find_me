@@ -17,11 +17,10 @@ class Api {
   SharedPreferencesService sharedPref = sl<SharedPreferencesService>();
   Dio dio = Dio(
     BaseOptions(
-      baseUrl: 'https://go-find-me.herokuapp.com/api',
-      validateStatus: (status){
-        return status! <= 300;
-      }
-    ),
+        baseUrl: 'https://go-find-me.herokuapp.com/api',
+        validateStatus: (status) {
+          return status! <= 300;
+        }),
   );
 
   Api() {
@@ -229,14 +228,14 @@ class Api {
     }
   }
 
-  Future<PostQueryResponse> getFeed() async {
+  Future<PostQueryResponse> getPosts({String? url}) async {
     try {
-      Response<Map<String,dynamic>> response = await dio.get("/post/");
+      Response<Map<String, dynamic>> response = await dio.get(url ?? "/post/");
 
-      Map<String,dynamic > resultData = response.data!;
+      Map<String, dynamic> resultData = response.data!;
 
-
-     PostQueryResponse postQueryResponse = PostQueryResponse.fromJson(resultData);
+      PostQueryResponse postQueryResponse =
+          PostQueryResponse.fromJson(resultData);
       List<Post?>? posts;
       return postQueryResponse;
     } on DioError catch (err) {

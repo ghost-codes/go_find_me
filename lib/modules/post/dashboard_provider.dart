@@ -19,28 +19,60 @@ class DashBoardEvent<T> {
 class DashboardProvider extends BaseProvider<DashBoardEvent> {
   BuildContext rootContext;
   bool confirmDelete = false;
-
-  DashboardProvider({required this.rootContext}) {
-    getFeedBody();
-  }
-
   Api _api = sl<Api>();
   bool reload = false;
   List<Post?>? currentData;
   String? nextPostPage;
+  late ScrollController _scrollController;
 
-  getFeedBody() async {
+  ScrollController get scrollContoller => _scrollController;
+
+  DashboardProvider({required this.rootContext}) {
+    _scrollController = ScrollController()
+      ..addListener(scrollListenerForPagination);
+    getFeedBody();
+  }
+
+  void scrollListenerForPagination() {
+    _scrollController.addListener(() {
+      if (_scrollController.position.maxScrollExtent ==
+          scrollContoller.position.pixels) _getMorePosts();
+    });
+  }
+
+  Future<void> _getMorePosts() async {
+    if (lastEvent!.state == DashBoardEventState.isloading ||
+        nextPostPage == null) return;
+
+    try {
+      addEvent(DashBoardEvent(state: DashBoardEventState.isloading));
+      PostQueryResponse response = await _api.getPosts(url: nextPostPage);
+      currentData!.addAll(response.posts!);
+      nextPostPage = response.next;
+      if (response == null) {
+        addEvent(DashBoardEvent(state: DashBoardEventState.error));
+        return;
+      }
+
+      addEvent(DashBoardEvent(state: DashBoardEventState.success));
+    } on NetworkError catch (netErr) {
+      addEvent(DashBoardEvent(state: DashBoardEventState.error));
+      Dialogs.errorDialog(rootContext, netErr.error);
+    }
+  }
+
+  Future<void> getFeedBody() async {
     addEvent(DashBoardEvent(state: DashBoardEventState.isloading));
 
     try {
-      PostQueryResponse response = await _api.getFeed();
+      PostQueryResponse response = await _api.getPosts();
       currentData = response.posts;
       nextPostPage = response.next;
       if (response == null) {
         addEvent(DashBoardEvent(state: DashBoardEventState.error));
         return;
       }
-    
+
       addEvent(DashBoardEvent(state: DashBoardEventState.success));
     } on NetworkError catch (netErr) {
       addEvent(DashBoardEvent(state: DashBoardEventState.error));

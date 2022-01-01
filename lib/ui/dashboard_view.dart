@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/models/OnPopModel.dart';
@@ -29,115 +30,134 @@ class DashboardView extends StatefulWidget {
 }
 
 class _DashboardViewState extends State<DashboardView> {
+  DashboardProvider? _dashBoardProvider;
+
   @override
   void initState() {
-    // Provider.of<DashboardProvider>(context, listen: false).getFeedBody();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark // status bar color
+        ));
+    _dashBoardProvider = DashboardProvider(rootContext: context);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => DashboardProvider(rootContext: context),
+      create: (context) => _dashBoardProvider,
       child: Consumer2<DashboardProvider, AuthenticationProvider>(
           builder: (context, dashboardProv, authProv, _) {
-        return Scaffold(
-          drawer: Drawer(
-            child: ListView(
-              children: [
-                ListTile(
-                  title: Text(
-                    "Logout",
-                    style: ThemeTexTStyle.regularPrim,
-                  ),
-                  onTap: () {
-                    Scaffold.of(context).openDrawer();
-                    authProv.logOut(context);
-                  },
-                )
-              ],
-            ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            focusColor: ThemeColors.primary,
-            child: Icon(Icons.add),
-            onPressed: () async {
-              OnPopModel? onPopModel = await Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => CreatePostView()));
-              if (onPopModel != null && onPopModel.reloadPrev) {
-                dashboardProv.getFeedBody();
-              }
-            },
-          ),
-          body: SafeArea(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  await dashboardProv.getFeedBody();
-                },
-                child: CustomScrollView(
-                  clipBehavior: Clip.none,
-                  slivers: [
-                    SliverAppBar(
-                      floating: true,
-                      title: AppBarWidget(),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
-                        ),
-                      ),
-                      automaticallyImplyLeading: false,
-                      elevation: 20,
-                      shadowColor: ThemeColors.black,
-                      backgroundColor: ThemeColors.white,
+        return SafeArea(
+          child: Scaffold(
+            drawer: Drawer(
+              child: ListView(
+                children: [
+                  ListTile(
+                    title: Text(
+                      "Logout",
+                      style: ThemeTexTStyle.regularPrim,
                     ),
-                    SliverList(
-                      delegate: SliverChildListDelegate(dashboardProv
-                                      .lastEvent?.state ==
-                                  DashBoardEventState.isloading &&
-                              (dashboardProv.currentData?.length == 0 ||
-                                  dashboardProv.currentData == null)
-                          ? [
-                              Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            ]
-                          : dashboardProv.currentData?.length == 0 ||
-                                  dashboardProv.currentData == null
-                              ? [
-                                  Center(
-                                    child: Text(
-                                      "No Posts To Show",
-                                      style: ThemeTexTStyle.headerPrim,
+                    onTap: () {
+                      Scaffold.of(context).openDrawer();
+                      authProv.logOut(context);
+                    },
+                  )
+                ],
+              ),
+            ),
+            floatingActionButton: FloatingActionButton(
+              focusColor: ThemeColors.primary,
+              child: Icon(Icons.add),
+              onPressed: () async {
+                OnPopModel? onPopModel = await Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CreatePostView()));
+                if (onPopModel != null && onPopModel.reloadPrev) {
+                  dashboardProv.getFeedBody();
+                }
+              },
+            ),
+            body: SafeArea(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await dashboardProv.getFeedBody();
+                  },
+                  child: CustomScrollView(
+                    controller: dashboardProv.scrollContoller,
+                    clipBehavior: Clip.none,
+                    slivers: [
+                      SliverAppBar(
+                        floating: true,
+                        title: AppBarWidget(),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          ),
+                        ),
+                        automaticallyImplyLeading: false,
+                        elevation: 20,
+                        shadowColor: ThemeColors.black,
+                        backgroundColor: ThemeColors.white,
+                      ),
+                      SliverList(
+                        delegate: SliverChildListDelegate(dashboardProv
+                                        .lastEvent?.state ==
+                                    DashBoardEventState.isloading &&
+                                (dashboardProv.currentData?.length == 0 ||
+                                    dashboardProv.currentData == null)
+                            ? [
+                                Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ]
+                            : dashboardProv.currentData?.length == 0 ||
+                                    dashboardProv.currentData == null
+                                ? [
+                                    Center(
+                                      child: Text(
+                                        "No Posts To Show",
+                                        style: ThemeTexTStyle.headerPrim,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(height: 15),
-                                  Center(
-                                      child: ThemeButton.ButtonSec(
-                                          text: "Retry",
-                                          onpressed: () {
-                                            dashboardProv.getFeedBody();
-                                          }))
-                                ]
-                              : [
-                                  dashboardProv.lastEvent?.state ==
-                                          DashBoardEventState.isloading
-                                      ? LinearProgressIndicator()
-                                      : SizedBox(),
-                                  ...List.generate(
-                                    dashboardProv.currentData!.length,
-                                    (index) => PostCard(
-                                      post: dashboardProv.currentData![index]!,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 50,
-                                  )
-                                ]),
-                    )
-                  ],
+                                    SizedBox(height: 15),
+                                    Center(
+                                        child: ThemeButton.ButtonSec(
+                                            text: "Retry",
+                                            onpressed: () {
+                                              dashboardProv.getFeedBody();
+                                            }))
+                                  ]
+                                : [
+                                    dashboardProv.lastEvent?.state ==
+                                            DashBoardEventState.isloading
+                                        ? LinearProgressIndicator()
+                                        : SizedBox(),
+                                    ...List.generate(
+                                        dashboardProv.currentData!.length + 1,
+                                        (index) {
+                                      if (index ==
+                                          dashboardProv.currentData!.length)
+                                        return Visibility(
+                                          visible:
+                                              dashboardProv.lastEvent?.state ==
+                                                  DashBoardEventState.isloading,
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        );
+                                      return PostCard(
+                                        post:
+                                            dashboardProv.currentData![index]!,
+                                      );
+                                    }),
+                                    SizedBox(height: 30)
+                                  ]),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
