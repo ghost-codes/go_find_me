@@ -74,9 +74,11 @@ export class AuthService {
     if (hash !== user.passHash)
       throw new UnauthorizedException('Please provide correct parameters');
 
-    bcrypt.hash(newPassword, 10).then((value) => {
+    console.log(user.password);
+    await bcrypt.hash(newPassword, 10).then((value) => {
       user.password = value;
     });
+    console.log(user.password);
 
     const updatedUser: User = await this.userModel.findByIdAndUpdate(
       user.id,
