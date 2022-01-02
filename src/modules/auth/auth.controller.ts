@@ -59,11 +59,7 @@ export class AuthController {
 
   @Put('change_password/forgotten_password')
   async changePasswordForgotPassword(@Body() data: ChangeForgottenPasswordDto) {
-    return this.authService.changePassword(
-      data.newPassword,
-      data.email,
-      data.hash,
-    );
+    return this.authService.changePassword(data.newPassword, data.token);
   }
 
   @Post('phone-number/send_otp')

@@ -72,7 +72,7 @@ export class EmailConfirmationService {
     const payload = await this.verifyConfirmationToken(
       forgotPassCode.confirmation_token,
     );
-    const user: User = await this.userModel.findOne({ email: payload });
+    const user: User = await this.userModel.findOne({ email: payload.email });
     if (!user) throw new NotFoundException('User not found');
     const is_verified = notp.totp.verify(
       forgotPassCode.otp,
@@ -88,7 +88,12 @@ export class EmailConfirmationService {
     );
     if (!updatedUser)
       throw new InternalServerErrorException('Something went wrong');
-    return { message: 'Correct Passcode', hash: user.passHash };
+
+    const token = await this.generateConfirmaToken({
+      hash: user.passHash,
+      email: user.email,
+    });
+    return { message: 'Correct Passcode', token: token.confirmation_token };
   }
 
   async confirmUser(confirmEmail: Confirm) {
@@ -118,10 +123,10 @@ export class EmailConfirmationService {
     };
   }
 
-  async verifyConfirmationToken(token: string): Promise<string> {
+  async verifyConfirmationToken(token: string): Promise<any> {
     try {
       const payload = this.jwtService.verify(token);
-      return payload.email;
+      return payload;
     } catch (e) {
       throw new ForbiddenException('Invalid Token');
     }

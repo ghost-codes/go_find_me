@@ -16,12 +16,14 @@ import { UserSession } from './interfaces/userSession.interface';
 import { LoginEmailDTO } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import { EmailConfirmationService } from './emailconfirmation.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private jwtService: JwtService,
+    private emailConfirmationService: EmailConfirmationService,
   ) {}
 
   async validateUser(
@@ -65,20 +67,18 @@ export class AuthService {
     return response;
   }
 
-  async changePassword(
-    newPassword: string,
-    email: string,
-    hash: string,
-  ): Promise<any> {
-    const user: User = await this.userModel.findOne({ email: email });
-    if (hash !== user.passHash)
+  async changePassword(newPassword: string, token: string): Promise<any> {
+    const payload = await this.emailConfirmationService.verifyConfirmationToken(
+      token,
+    );
+
+    const user: User = await this.userModel.findOne({ email: payload.email });
+    if (payload.hash !== user.passHash)
       throw new UnauthorizedException('Please provide correct parameters');
 
-    console.log(user.password);
     await bcrypt.hash(newPassword, 10).then((value) => {
       user.password = value;
     });
-    console.log(user.password);
 
     const updatedUser: User = await this.userModel.findByIdAndUpdate(
       user.id,

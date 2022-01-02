@@ -5,8 +5,5 @@ export class ChangeForgottenPasswordDto {
   newPassword: string;
 
   @ApiProperty()
-  hash: string;
-
-  @ApiProperty()
-  email: string;
+  token: string;
 }
