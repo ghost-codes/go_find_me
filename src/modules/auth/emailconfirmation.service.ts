@@ -100,7 +100,7 @@ export class EmailConfirmationService {
     const payload = await this.verifyConfirmationToken(
       confirmEmail.confirmation_token,
     );
-    const user: User = await this.userModel.findOne({ email: payload });
+    const user: User = await this.userModel.findOne({ email: payload.email });
     if (!user) throw new NotFoundException('User not found');
     const is_verified = notp.totp.verify(
       confirmEmail.otp,
