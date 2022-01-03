@@ -64,11 +64,6 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
     notifyListeners();
   }
 
-  String? isEmptyValidator(String val) {
-    if (val.trim().length == 0) return "Input required";
-    return null;
-  }
-
   getStoredUser(BuildContext context) async {
     Map<String, dynamic> userJson = json
         .decode((await _sharedPref.getStringValuesSF("currentUser")) ?? "{}");
@@ -182,15 +177,6 @@ class AuthenticationProvider extends BaseProvider<AuthEvent> {
     } on NetworkError catch (err) {
       Dialogs.errorDialog(context, err.error);
       addEvent(AuthEvent(state: AuthEventState.error));
-    }
-  }
-
-  String? passwordValidate(String? value, TextEditingController pass) {
-    print(value);
-    if (pass.text == value) {
-      return null;
-    } else {
-      return "Passwords do not match";
     }
   }
 }
