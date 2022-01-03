@@ -64,7 +64,7 @@
 //           context, MaterialPageRoute(builder: (context) => HomeView()));
 //     } else if (!isInternetConnected) {
 //       isTokenAuthenticatingSink.add(false);
-//       ScaffoldMessenger.of(context).showSnackBar(
+//       postsenger.of(context).showSnackBar(
 //         SnackBar(
 //           content: Text(
 //             "Check internet Connectivity",

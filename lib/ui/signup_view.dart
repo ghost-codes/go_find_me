@@ -3,6 +3,7 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:project_android/components/passwordTextField.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/modules/auth/authProvider.dart';
+import 'package:project_android/modules/auth/validators.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/themes/dropShadows.dart';
@@ -120,12 +121,17 @@ class SignUp extends StatelessWidget with InputDec {
             TextFormField(
               controller: authProv.signUpUsername,
               decoration: inputDec(hint: "Username*"),
-              validator: (val){return authProv.isEmptyValidator(val!);},
+              validator: (val) {
+                return AuthValidators.isEmptyValidator(val!);
+              },
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             TextFormField(
               controller: authProv.singupEmail,
-              decoration: inputDec(hint: "Email*"),validator: (val){return authProv.isEmptyValidator(val!);},
+              decoration: inputDec(hint: "Email*"),
+              validator: (val) {
+                return AuthValidators.isEmptyValidator(val!);
+              },
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             Container(
@@ -148,14 +154,16 @@ class SignUp extends StatelessWidget with InputDec {
             SizedBox(height: 2 * ThemePadding.padBase),
             PasswordTextField(
               inputDec: inputDec(hint: "Password*"),
-              controller: authProv.signUpPassword,validator: (val){return authProv.isEmptyValidator(val!);},
+              controller: authProv.signUpPassword,
+              validator: (val) {
+                return AuthValidators.isEmptyValidator(val!);
+              },
             ),
             SizedBox(height: 2 * ThemePadding.padBase),
             TextFormField(
               autovalidateMode: AutovalidateMode.always,
               validator: (value) {
-                  
-                return authProv.passwordValidate(
+                return AuthValidators.passwordValidate(
                     value, authProv.signUpPassword);
               },
               decoration: inputDec(hint: "Confirm Password"),
@@ -165,9 +173,8 @@ class SignUp extends StatelessWidget with InputDec {
             ThemeButton.longButtonPrim(
               text: "Sign Up",
               onpressed: () {
-                if(authProv.signUpEmailFormKey.currentState!.validate())
-                authProv.emailSignup(_scaffold.currentContext!);
-            
+                if (authProv.signUpEmailFormKey.currentState!.validate())
+                  authProv.emailSignup(_scaffold.currentContext!);
               },
             ),
           ],

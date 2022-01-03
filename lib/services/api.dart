@@ -158,6 +158,18 @@ class Api {
     }
   }
 
+  Future<void> sendForgotPasswordCode(String email) async {
+    try {
+      Response<Map<String, dynamic>> response = await dio.post(
+          '/auth/email/forgotten_password/send_code',
+          data: {'email': email});
+      await sharedPref.addStringToSF(
+          'forgotten_password_token', response.data!["confirmation_token"]);
+    } on DioError catch (error) {
+      throw new NetworkError(error);
+    }
+  }
+
   Future<UserModel> confirmPhone(Map<String, dynamic> map) async {
     try {
       Response<Map<String, dynamic>> response =

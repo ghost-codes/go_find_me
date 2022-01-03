@@ -3,12 +3,14 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:project_android/components/passwordTextField.dart';
 import 'package:project_android/components/text_fields.dart';
 import 'package:project_android/modules/auth/authProvider.dart';
+import 'package:project_android/modules/auth/validators.dart';
 import 'package:project_android/themes/borderRadius.dart';
 import 'package:project_android/components/buttons.dart';
 import 'package:project_android/themes/dropShadows.dart';
 import 'package:project_android/themes/padding.dart';
 import 'package:project_android/themes/textStyle.dart';
 import 'package:project_android/themes/theme_colors.dart';
+import 'package:project_android/ui/forgot_password_identity_page.dart';
 import 'package:project_android/ui/signup_view.dart';
 import 'package:provider/provider.dart';
 
@@ -115,6 +117,24 @@ class _LoginState extends State<Login> with InputDec {
                                   authProv.isPhoneLogin
                                       ? loginPhoneForm(context)
                                       : loginEmailForm(context),
+                                  Divider(
+                                    height: 30,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  ForgotPasswordIdentitypage()));
+                                    },
+                                    child: Text(
+                                      "Forgot Password?",
+                                      style: TextStyle(
+                                          fontFamily: "Montserrat",
+                                          color: ThemeColors.primary),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -184,7 +204,7 @@ class _LoginState extends State<Login> with InputDec {
           children: [
             TextFormField(
               validator: (val) {
-                return authProv.isEmptyValidator(val!);
+                return AuthValidators.isEmptyValidator(val!);
               },
               controller: authProv.loginEmail,
               decoration: inputDec(hint: "Username or Email"),
@@ -192,7 +212,7 @@ class _LoginState extends State<Login> with InputDec {
             SizedBox(height: 2 * ThemePadding.padBase),
             PasswordTextField(
               validator: (val) {
-                return authProv.isEmptyValidator(val!);
+                return AuthValidators.isEmptyValidator(val!);
               },
               controller: authProv.loginPassworrd,
               inputDec: inputDec(hint: "Password"),
