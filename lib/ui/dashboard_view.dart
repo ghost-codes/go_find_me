@@ -756,10 +756,10 @@ class AppBarWidget extends StatelessWidget with InputDec {
             ),
           ),
         ),
-        Icon(
-          Icons.settings,
-          color: ThemeColors.primary,
-        ),
+        // Icon(
+        //   Icons.settings,
+        //   color: ThemeColors.primary,
+        // ),
       ],
     );
   }
