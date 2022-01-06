@@ -170,6 +170,25 @@ class Api {
     }
   }
 
+  Future<void> confirmForgotPasswordCode(String code) async {
+    String? token =
+        await sharedPref.getStringValuesSF('forgotten_password_token');
+
+    if (token == null)
+      throw new NetworkError(DioError(
+          requestOptions: RequestOptions(
+        path: '',
+      )));
+    try {
+      Response<Map<String, dynamic>> response = await dio.post(
+          '/auth/email/confirm_code/forgotten_password',
+          data: {"confirmation_token": "", "otp": code});
+      print(response.data);
+    } on DioError catch (err) {
+      throw new NetworkError(err);
+    }
+  }
+
   Future<UserModel> confirmPhone(Map<String, dynamic> map) async {
     try {
       Response<Map<String, dynamic>> response =
