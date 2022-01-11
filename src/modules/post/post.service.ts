@@ -60,8 +60,8 @@ export class PostService {
   }
 
   async updatePost(updatePostModel: UpdatePost): Promise<Post> {
-    console.log(updatePostModel);
-    const updatedPost = this.postModel.findByIdAndUpdate(
+   
+    const updatedPost =await this.postModel.findByIdAndUpdate(
       updatePostModel.id,
       updatePostModel,
     );

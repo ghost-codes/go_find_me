@@ -39,8 +39,8 @@ export class AuthService {
     return null;
   }
 
-  async validatePassHash(passHash: string, email: string): Promise<boolean> {
-    const user = await this.userModel.findOne({ email: email });
+  async validatePassHash(passHash: string, username: string): Promise<boolean> {
+    const user:User = await this.userModel.findOne({ username: username });
     return passHash === user.passHash;
   }
 
