@@ -122,6 +122,9 @@ export class AuthService {
   async refreshAccessToken(refreshToken: string): Promise<UserSession> {
     const payload = this.validateToken(refreshToken);
     if (!payload) throw new UnauthorizedException('Unathorized credentials');
+    const user:User = this.userModel.findOne({username:payload.username});
+    if(!user ) throw new UnauthorizedException('Unauthorized credentials');
+    if(user.passHash != payload.passHash )  throw new UnauthorizedException('Password has been changed');
     const accessToken = await this.generateAccessToken(payload);
     const userSession: UserSession = {
       accessToken: accessToken.access_token,
