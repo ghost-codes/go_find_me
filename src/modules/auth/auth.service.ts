@@ -40,7 +40,7 @@ export class AuthService {
   }
 
   async validatePassHash(passHash: string, username: string): Promise<boolean> {
-    const user:User = await this.userModel.findOne({ username: username });
+    const user: User = await this.userModel.findOne({ username: username });
     return passHash === user.passHash;
   }
 
@@ -120,11 +120,14 @@ export class AuthService {
   }
 
   async refreshAccessToken(refreshToken: string): Promise<UserSession> {
-    const payload = this.validateToken(refreshToken);
+    const payload = await this.validateToken(refreshToken);
     if (!payload) throw new UnauthorizedException('Unathorized credentials');
-    const user:User = this.userModel.findOne({username:payload.username});
-    if(!user ) throw new UnauthorizedException('Unauthorized credentials');
-    if(user.passHash != payload.passHash )  throw new UnauthorizedException('Password has been changed');
+    const user: User = await this.userModel.findOne({
+      username: payload.username,
+    });
+    if (!user) throw new UnauthorizedException('Unauthorized credentials');
+    if (user.passHash != payload.passHash)
+      throw new UnauthorizedException('Password has been changed');
     const accessToken = await this.generateAccessToken(payload);
     const userSession: UserSession = {
       accessToken: accessToken.access_token,
