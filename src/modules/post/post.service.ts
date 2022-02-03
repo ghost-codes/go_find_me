@@ -16,6 +16,7 @@ import {
   ContributionDocument,
 } from './schema/contribution.schema';
 import { CreateContribution } from './interfaces/create_contribution.interface';
+import { PushNotificationService } from '../push-notification/push-notification.service';
 
 @Injectable()
 export class PostService {
@@ -27,6 +28,8 @@ export class PostService {
 
     @InjectModel(Contribution.name)
     private readonly contributionModel: Model<ContributionDocument>,
+
+    private readonly pushNotificationService: PushNotificationService,
   ) {}
 
   async getPosts(page: number): Promise<any> {
@@ -60,8 +63,7 @@ export class PostService {
   }
 
   async updatePost(updatePostModel: UpdatePost): Promise<Post> {
-   
-    const updatedPost =await this.postModel.findByIdAndUpdate(
+    const updatedPost = await this.postModel.findByIdAndUpdate(
       updatePostModel.id,
       updatePostModel,
     );
@@ -105,6 +107,11 @@ export class PostService {
     const updatedPost = await this.postModel.findByIdAndUpdate(
       savedContribution.post_id,
       post,
+    );
+
+    await this.pushNotificationService.createNotificationSingle(
+      'Contribution added to your post',
+      post.user_id,
     );
 
     if (!updatedPost)

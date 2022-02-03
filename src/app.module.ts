@@ -9,10 +9,16 @@ import { ImageUploadModule } from './modules/image-upload/image-upload.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { PushNotificationModule } from './modules/push-notification/push-notification.module';
+import { OneSignalModule } from 'onesignal-api-client-nest';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    OneSignalModule.forRoot({
+      appId: process.env.ONE_SIGNAL_APP_ID,
+      restApiKey: process.env.ONE_SIGNAL_API_KEY,
+    }),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.sendgrid.net',
@@ -41,6 +47,7 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
       isGlobal: true,
     }),
     ImageUploadModule,
+    PushNotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
