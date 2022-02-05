@@ -10,6 +10,7 @@ export interface UserReponseModel {
   email: string;
   phone_number: string;
   confirmed_at: Date;
+  bookmarked_posts: string[];
 }
 
 export interface AuthenticationResponse {

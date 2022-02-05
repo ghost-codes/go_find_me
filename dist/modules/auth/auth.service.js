@@ -52,6 +52,7 @@ let AuthService = class AuthService {
                 id: userResponse.id,
                 phone_number: userResponse.phone_number,
                 confirmed_at: userResponse.confirmed_at,
+                bookmarked_posts: savedUser.bookmarked_posts,
             },
             accessToken: access_token.access_token,
             refreshToken: refresh_token.refresh_token,

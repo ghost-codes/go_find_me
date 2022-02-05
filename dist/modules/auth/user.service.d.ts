@@ -4,4 +4,5 @@ export declare class UserService {
     private readonly userModel;
     constructor(userModel: Model<UserDocument>);
     getSingleUser(id: string): Promise<User>;
+    updateUser(id: string, data: User): Promise<any>;
 }

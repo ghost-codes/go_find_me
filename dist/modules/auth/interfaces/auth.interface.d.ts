@@ -14,4 +14,5 @@ export interface AuthenticationResponse {
     user: UserReponseModel;
     accessToken: string;
     refreshToken: string;
+    bookmarked_posts: string[];
 }

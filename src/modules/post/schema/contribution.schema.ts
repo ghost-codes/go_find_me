@@ -10,6 +10,9 @@ export class Contribution {
   @Prop({ required: true })
   post_id: string;
 
+  @Prop({ required: true })
+  user_id: string;
+
   @Prop()
   time_sighted: Date;
 

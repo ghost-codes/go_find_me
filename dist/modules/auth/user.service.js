@@ -27,6 +27,12 @@ let UserService = class UserService {
             throw new common_1.NotFoundException('User not found');
         return user;
     }
+    async updateUser(id, data) {
+        const user = await this.userModel.findByIdAndUpdate(id, data);
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        return { message: 'User updated' };
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),

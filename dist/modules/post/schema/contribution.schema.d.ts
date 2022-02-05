@@ -3,6 +3,7 @@ export declare type ContributionDocument = Contribution & Document;
 export declare class Contribution {
     location_sighted: string;
     post_id: string;
+    user_id: string;
     time_sighted: Date;
     date_sighted: Date;
     created_at: Date;

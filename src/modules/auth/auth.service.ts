@@ -24,7 +24,7 @@ export class AuthService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     private jwtService: JwtService,
     private emailConfirmationService: EmailConfirmationService,
-  ) {}
+  ) { }
 
   async validateUser(
     username: string,
@@ -59,6 +59,7 @@ export class AuthService {
         id: userResponse.id,
         phone_number: userResponse.phone_number,
         confirmed_at: userResponse.confirmed_at,
+        bookmarked_posts: savedUser.bookmarked_posts,
       },
       accessToken: access_token.access_token,
       refreshToken: refresh_token.refresh_token,
@@ -111,6 +112,7 @@ export class AuthService {
         id: user.id,
         phone_number: user.phone_number,
         confirmed_at: user.confirmed_at,
+        bookmarked_posts: user.bookmarked_posts,
       },
       accessToken: accessToken.access_token,
       refreshToken: refreshToken.refresh_token,
@@ -140,7 +142,7 @@ export class AuthService {
     try {
       const result = this.jwtService.verifyAsync(token);
       return result;
-    } catch (e) {}
+    } catch (e) { }
     return null;
   }
 

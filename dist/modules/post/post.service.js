@@ -60,28 +60,90 @@ let PostService = class PostService {
             throw new common_1.NotFoundException('Post not found');
         return { message: 'Success', post: post };
     }
-    async getCommentsPosts(id) {
+    async getCommentsPosts(page, id) {
+        if (!page)
+            page = 0;
+        const contributions = await this.contributionModel.find({
+            user_id: id,
+        });
+        const post_ids = contributions.map((e) => {
+            return e.post_id;
+        });
         if (!id)
             throw new common_1.InternalServerErrorException('Sorry Error Occured');
-        const post = await this.postModel.find({ contributions: id });
-        if (!post)
-            return { posts: [] };
-        return { posts: post };
+        const posts = await this.postModel
+            .find()
+            .where('_id')
+            .in(post_ids)
+            .sort({ _id: -1 })
+            .skip(page * 20)
+            .limit(20);
+        if (!posts)
+            return {
+                posts: [],
+                next: null,
+                prev: `/api/post/contributed_posts/:id?page=${page}`,
+            };
+        if (posts.length < 20)
+            return {
+                posts,
+                next: null,
+                prev: `/api/post/contributed_posts/:id?page=${page}`,
+            };
+        let next = page;
+        return {
+            posts,
+            next: `/api/post/contributed_posts/:id?page=${++next}`,
+            prev: `/api/post/contributed_posts/:id?page=${page}`,
+        };
     }
-    async getBookmarkedPosts(id) {
+    async getBookmarkedPosts(page, id) {
         if (!id)
             throw new common_1.InternalServerErrorException('Sorry error occured');
         const user = await this.userService.getSingleUser(id);
         if (!user)
             throw new common_1.NotFoundException('User does not exist');
-        console.log(user.bookmarked_posts);
+        if (!page)
+            page = 0;
         const bookmarkedPosts = await this.postModel
             .find()
             .where('_id')
-            .in(user.bookmarked_posts);
+            .in(user.bookmarked_posts)
+            .sort({ _id: -1 })
+            .skip(page * 20)
+            .limit(20);
         if (!bookmarkedPosts)
-            return { posts: [] };
-        return { posts: bookmarkedPosts };
+            return { posts: [], next: null, prev: `/api/post/?page=${page}` };
+        if (bookmarkedPosts.length < 20)
+            return {
+                posts: bookmarkedPosts,
+                next: null,
+                prev: `/api/post/?page=${page}`,
+            };
+        let next = page;
+        return {
+            posts: bookmarkedPosts,
+            next: `/api/post/?page=${++next}`,
+            prev: `/api/post/?page=${page}`,
+        };
+    }
+    async bookmarkPost(id, postId) {
+        if (!id)
+            throw new common_1.InternalServerErrorException('Sorry  error occured');
+        const user = await this.userService.getSingleUser(id);
+        if (!user.bookmarked_posts.includes(postId))
+            user.bookmarked_posts = [...user.bookmarked_posts, postId];
+        return this.userService.updateUser(id, user);
+    }
+    async unBookmarkPost(id, postId) {
+        if (!id)
+            throw new common_1.InternalServerErrorException('Sorry  error occured');
+        const user = await this.userService.getSingleUser(id);
+        if (user.bookmarked_posts.includes(postId))
+            user.bookmarked_posts = user.bookmarked_posts.filter((e) => {
+                return e !== postId;
+            });
+        return this.userService.updateUser(id, user);
     }
     async getMyPosts(page, id) {
         if (!page)

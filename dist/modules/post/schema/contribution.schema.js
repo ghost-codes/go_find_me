@@ -22,6 +22,10 @@ __decorate([
     __metadata("design:type", String)
 ], Contribution.prototype, "post_id", void 0);
 __decorate([
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Contribution.prototype, "user_id", void 0);
+__decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], Contribution.prototype, "time_sighted", void 0);

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_guard_1 = require("../auth/guard/jwt.guard");
+const bookmark_post_dto_1 = require("./dto/bookmark_post.dto");
 const createPost_dto_1 = require("./dto/createPost.dto");
 const create_contribution_dto_1 = require("./dto/create_contribution.dto");
 const updatePost_dto_1 = require("./dto/updatePost.dto");
@@ -32,11 +33,17 @@ let PostController = class PostController {
     getMyPost(id, page) {
         return this.postService.getMyPosts(page, id);
     }
-    getCommentedPosts(id) {
-        return this.postService.getCommentsPosts(id);
+    getCommentedPosts(page, id) {
+        return this.postService.getCommentsPosts(page, id);
     }
-    getBookMarkedPosts(id) {
-        return this.postService.getBookmarkedPosts(id);
+    getBookMarkedPosts(page, id) {
+        return this.postService.getBookmarkedPosts(page, id);
+    }
+    bookmarkPost(body, id) {
+        return this.postService.bookmarkPost(id, body.postId);
+    }
+    unbookmarkPost(body, id) {
+        return this.postService.unBookmarkPost(id, body.postId);
     }
     createPost(files, body) {
         return this.postService.createPost(body);
@@ -67,6 +74,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getOnePost", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     (0, common_1.Get)('/myposts/:id?'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Query)('page')),
@@ -75,19 +83,40 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getMyPost", null);
 __decorate([
-    (0, common_1.Get)('/contributed_posts/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)('/contributed_posts/:id?'),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getCommentedPosts", null);
 __decorate([
-    (0, common_1.Get)('/bookmarked_posts/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('/bookmarked_posts/:id?'),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getBookMarkedPosts", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('/bookmark_post/:userId'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [bookmark_post_dto_1.BookmarkPostDTO, String]),
+    __metadata("design:returntype", void 0)
+], PostController.prototype, "bookmarkPost", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('/unbookmark_post/:userId'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [bookmark_post_dto_1.BookmarkPostDTO, String]),
+    __metadata("design:returntype", void 0)
+], PostController.prototype, "unbookmarkPost", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),

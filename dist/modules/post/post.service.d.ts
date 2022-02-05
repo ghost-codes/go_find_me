@@ -17,8 +17,10 @@ export declare class PostService {
     constructor(connection: Connection, postModel: Model<PostDocument>, contributionModel: Model<ContributionDocument>, userService: UserService, imageUploadService: ImageUploadService, pushNotificationService: PushNotificationService);
     getPosts(page: number): Promise<any>;
     getOnePost(id: string): Promise<any>;
-    getCommentsPosts(id: string): Promise<any>;
-    getBookmarkedPosts(id: string): Promise<any>;
+    getCommentsPosts(page: number, id: string): Promise<any>;
+    getBookmarkedPosts(page: number, id: string): Promise<any>;
+    bookmarkPost(id: string, postId: string): Promise<any>;
+    unBookmarkPost(id: string, postId: string): Promise<any>;
     getMyPosts(page: number, id: string): Promise<any>;
     createPost(createPost: CreatePost): Promise<Post>;
     updatePost(updatePostModel: UpdatePost): Promise<Post>;

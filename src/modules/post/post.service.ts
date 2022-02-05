@@ -67,9 +67,18 @@ export class PostService {
 
   async getCommentsPosts(page: number, id: string): Promise<any> {
     if (!page) page = 0;
+    const contributions: Contribution[] = await this.contributionModel.find({
+      user_id: id,
+    });
+
+    const post_ids: string[] = contributions.map((e) => {
+      return e.post_id;
+    });
     if (!id) throw new InternalServerErrorException('Sorry Error Occured');
     const posts: Post[] = await this.postModel
-      .find({ contributions: id })
+      .find()
+      .where('_id')
+      .in(post_ids)
       .sort({ _id: -1 })
       .skip(page * 20)
       .limit(20);
@@ -129,8 +138,18 @@ export class PostService {
   async bookmarkPost(id: string, postId: string): Promise<any> {
     if (!id) throw new InternalServerErrorException('Sorry  error occured');
     const user: User = await this.userService.getSingleUser(id);
+    if (!user.bookmarked_posts.includes(postId))
+      user.bookmarked_posts = [...user.bookmarked_posts, postId];
+    return this.userService.updateUser(id, user);
+  }
 
-    user.bookmarked_posts = [...user.bookmarked_posts, postId];
+  async unBookmarkPost(id: string, postId: string): Promise<any> {
+    if (!id) throw new InternalServerErrorException('Sorry  error occured');
+    const user: User = await this.userService.getSingleUser(id);
+    if (user.bookmarked_posts.includes(postId))
+      user.bookmarked_posts = user.bookmarked_posts.filter((e) => {
+        return e !== postId;
+      });
     return this.userService.updateUser(id, user);
   }
 

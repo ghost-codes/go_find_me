@@ -31,6 +31,7 @@ export class PostController {
     return this.postService.getOnePost(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/myposts/:id?')
   getMyPost(
     @Param('id') id: string,
@@ -39,6 +40,7 @@ export class PostController {
     return this.postService.getMyPosts(page, id);
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Get('/contributed_posts/:id?')
   getCommentedPosts(
     @Query('page') page: number,
@@ -47,6 +49,7 @@ export class PostController {
     return this.postService.getCommentsPosts(page, id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/bookmarked_posts/:id?')
   getBookMarkedPosts(
     @Query('page') page: number,
@@ -55,9 +58,16 @@ export class PostController {
     return this.postService.getBookmarkedPosts(page, id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/bookmark_post/:userId')
   bookmarkPost(@Body() body: BookmarkPostDTO, @Param('userId') id: string) {
     return this.postService.bookmarkPost(id, body.postId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/unbookmark_post/:userId')
+  unbookmarkPost(@Body() body: BookmarkPostDTO, @Param('userId') id: string) {
+    return this.postService.unBookmarkPost(id, body.postId);
   }
 
   @UseGuards(JwtAuthGuard)
