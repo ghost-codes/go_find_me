@@ -56,7 +56,7 @@ export class PostController {
   }
 
   @Post('/bookmark_post/:userId')
-  bookmarkPost(@Body() body: BookmarkPostDTO, @Param('id') id: string) {
+  bookmarkPost(@Body() body: BookmarkPostDTO, @Param('userId') id: string) {
     return this.postService.bookmarkPost(id, body.postId);
   }
 
