@@ -20,4 +20,10 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
+
+  async updateUser(id: string, data: User): Promise<any> {
+    const user: User = await this.userModel.findByIdAndUpdate(id, data);
+    if (!user) throw new NotFoundException('User not found');
+    return { message: 'User updated' };
+  }
 }

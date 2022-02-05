@@ -65,26 +65,73 @@ export class PostService {
     return { message: 'Success', post: post };
   }
 
-  async getCommentsPosts(id: string): Promise<any> {
+  async getCommentsPosts(page: number, id: string): Promise<any> {
+    if (!page) page = 0;
     if (!id) throw new InternalServerErrorException('Sorry Error Occured');
-    const post: Post[] = await this.postModel.find({ contributions: id });
-    if (!post) return { posts: [] };
-    return { posts: post };
+    const posts: Post[] = await this.postModel
+      .find({ contributions: id })
+      .sort({ _id: -1 })
+      .skip(page * 20)
+      .limit(20);
+
+    if (!posts)
+      return {
+        posts: [],
+        next: null,
+        prev: `/api/post/contributed_posts/:id?page=${page}`,
+      };
+    if (posts.length < 20)
+      return {
+        posts,
+        next: null,
+        prev: `/api/post/contributed_posts/:id?page=${page}`,
+      };
+
+    let next: number = page;
+    return {
+      posts,
+      next: `/api/post/contributed_posts/:id?page=${++next}`,
+      prev: `/api/post/contributed_posts/:id?page=${page}`,
+    };
   }
 
-  async getBookmarkedPosts(id: string): Promise<any> {
+  async getBookmarkedPosts(page: number, id: string): Promise<any> {
     if (!id) throw new InternalServerErrorException('Sorry error occured');
     const user: User = await this.userService.getSingleUser(id);
 
     if (!user) throw new NotFoundException('User does not exist');
-
+    if (!page) page = 0;
     const bookmarkedPosts: Post[] = await this.postModel
       .find()
       .where('_id')
-      .in(user.bookmarked_posts);
+      .in(user.bookmarked_posts)
+      .sort({ _id: -1 })
+      .skip(page * 20)
+      .limit(20);
 
-    if (!bookmarkedPosts) return { posts: [] };
-    return { posts: bookmarkedPosts };
+    if (!bookmarkedPosts)
+      return { posts: [], next: null, prev: `/api/post/?page=${page}` };
+    if (bookmarkedPosts.length < 20)
+      return {
+        posts: bookmarkedPosts,
+        next: null,
+        prev: `/api/post/?page=${page}`,
+      };
+
+    let next: number = page;
+    return {
+      posts: bookmarkedPosts,
+      next: `/api/post/?page=${++next}`,
+      prev: `/api/post/?page=${page}`,
+    };
+  }
+
+  async bookmarkPost(id: string, postId: string): Promise<any> {
+    if (!id) throw new InternalServerErrorException('Sorry  error occured');
+    const user: User = await this.userService.getSingleUser(id);
+
+    user.bookmarked_posts = [...user.bookmarked_posts, postId];
+    return this.userService.updateUser(id, user);
   }
 
   async getMyPosts(page: number, id: string): Promise<any> {

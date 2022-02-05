@@ -11,6 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guard/jwt.guard';
+import { BookmarkPostDTO } from './dto/bookmark_post.dto';
 import { CreatePostDTO } from './dto/createPost.dto';
 import { CreateContributionDTO } from './dto/create_contribution.dto';
 import { UpdatePostDTO } from './dto/updatePost.dto';
@@ -38,19 +39,26 @@ export class PostController {
     return this.postService.getMyPosts(page, id);
   }
 
-  @Get('/contributed_posts/:id')
-  getCommentedPosts(@Param('id') id: string): Promise<any> {
-    return this.postService.getCommentsPosts(id);
+  @Get('/contributed_posts/:id?')
+  getCommentedPosts(
+    @Query('page') page: number,
+    @Param('id') id: string,
+  ): Promise<any> {
+    return this.postService.getCommentsPosts(page, id);
   }
 
-  @Get('/bookmarked_posts/:id')
-  getBookMarkedPosts(@Param('id') id: string): Promise<any> {
-    return this.postService.getBookmarkedPosts(id);
+  @Get('/bookmarked_posts/:id?')
+  getBookMarkedPosts(
+    @Query('page') page: number,
+    @Param('id') id: string,
+  ): Promise<any> {
+    return this.postService.getBookmarkedPosts(page, id);
   }
-  // @Get('page?')
-  // getPostsPerPage(@Query('page') page: number): Promise<any> {
-  //   return this.postService.getPosts(page);
-  // }
+
+  @Post('/bookmark_post/:userId')
+  bookmarkPost(@Body() body: BookmarkPostDTO, @Param('id') id: string) {
+    return this.postService.bookmarkPost(id, body.postId);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Post()
