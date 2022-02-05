@@ -38,6 +38,10 @@ __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], User.prototype, "passHash", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: [] }),
+    __metadata("design:type", Array)
+], User.prototype, "bookmarked_posts", void 0);
 User = __decorate([
     (0, mongoose_1.Schema)()
 ], User);

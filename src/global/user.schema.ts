@@ -22,6 +22,9 @@ export class User extends Document {
 
   @Prop({ required: true })
   passHash: string;
+
+  @Prop({ default: [] })
+  bookmarked_posts: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

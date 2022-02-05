@@ -6,6 +6,10 @@ export declare class PostController {
     private postService;
     constructor(postService: PostService);
     getAllPosts(page: number): Promise<any>;
+    getOnePost(id: string): Promise<any>;
+    getMyPost(id: string, page: number): Promise<any>;
+    getCommentedPosts(id: string): Promise<any>;
+    getBookMarkedPosts(id: string): Promise<any>;
     createPost(files: any, body: CreatePostDTO): Promise<import("./schema/post.schema").Post>;
     updatePost(body: UpdatePostDTO, postId: string): Promise<import("./schema/post.schema").Post>;
     deletePost(postId: string): Promise<boolean>;

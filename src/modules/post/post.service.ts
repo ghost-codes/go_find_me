@@ -17,6 +17,8 @@ import {
 } from './schema/contribution.schema';
 import { CreateContribution } from './interfaces/create_contribution.interface';
 import { PushNotificationService } from '../push-notification/push-notification.service';
+import { UserService } from '../auth/user.service';
+import { User } from 'src/global/user.schema';
 
 @Injectable()
 export class PostService {
@@ -24,10 +26,12 @@ export class PostService {
     @InjectConnection() private readonly connection: Connection,
 
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
-    private readonly imageUploadService: ImageUploadService,
 
     @InjectModel(Contribution.name)
     private readonly contributionModel: Model<ContributionDocument>,
+    private readonly userService: UserService,
+
+    private readonly imageUploadService: ImageUploadService,
 
     private readonly pushNotificationService: PushNotificationService,
   ) {}
@@ -36,6 +40,57 @@ export class PostService {
     if (!page) page = 0;
     const posts: Post[] = await this.postModel
       .find()
+      .sort({ _id: -1 })
+      .skip(page * 20)
+      .limit(20);
+
+    if (!posts)
+      return { posts: [], next: null, prev: `/api/post/page=${page}` };
+    if (posts.length < 20)
+      return { posts, next: null, prev: `/api/post/page=${page}` };
+
+    let next: number = page;
+    return {
+      posts,
+      next: `/api/post/?page=${++next}`,
+      prev: `/api/post/?page=${page}`,
+    };
+  }
+
+  async getOnePost(id: string): Promise<any> {
+    if (!id) throw new InternalServerErrorException('Sorry Error Occured');
+    const post: Post = await this.postModel.findById(id);
+
+    if (!post) throw new NotFoundException('Post not found');
+    return { message: 'Success', post: post };
+  }
+
+  async getCommentsPosts(id: string): Promise<any> {
+    if (!id) throw new InternalServerErrorException('Sorry Error Occured');
+    const post: Post[] = await this.postModel.find({ contributions: id });
+    if (!post) return { posts: [] };
+    return { posts: post };
+  }
+
+  async getBookmarkedPosts(id: string): Promise<any> {
+    if (!id) throw new InternalServerErrorException('Sorry error occured');
+    const user: User = await this.userService.getSingleUser(id);
+
+    if (!user) throw new NotFoundException('User does not exist');
+
+    const bookmarkedPosts: Post[] = await this.postModel
+      .find()
+      .where('_id')
+      .in(user.bookmarked_posts);
+
+    if (!bookmarkedPosts) return { posts: [] };
+    return { posts: bookmarkedPosts };
+  }
+
+  async getMyPosts(page: number, id: string): Promise<any> {
+    if (!page) page = 0;
+    const posts: Post[] = await this.postModel
+      .find({ user_id: id })
       .sort({ _id: -1 })
       .skip(page * 20)
       .limit(20);

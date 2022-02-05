@@ -26,6 +26,18 @@ let PostController = class PostController {
     getAllPosts(page) {
         return this.postService.getPosts(page);
     }
+    getOnePost(id) {
+        return this.postService.getOnePost(id);
+    }
+    getMyPost(id, page) {
+        return this.postService.getMyPosts(page, id);
+    }
+    getCommentedPosts(id) {
+        return this.postService.getCommentsPosts(id);
+    }
+    getBookMarkedPosts(id) {
+        return this.postService.getBookmarkedPosts(id);
+    }
     createPost(files, body) {
         return this.postService.createPost(body);
     }
@@ -37,7 +49,6 @@ let PostController = class PostController {
         return this.postService.deletePost(postId);
     }
     crateContribution(createContribution) {
-        console.log('dddd');
         return this.postService.createContribution(createContribution);
     }
 };
@@ -48,6 +59,35 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], PostController.prototype, "getAllPosts", null);
+__decorate([
+    (0, common_1.Get)('/single_post/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getOnePost", null);
+__decorate([
+    (0, common_1.Get)('/myposts/:id?'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('page')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getMyPost", null);
+__decorate([
+    (0, common_1.Get)('/contributed_posts/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getCommentedPosts", null);
+__decorate([
+    (0, common_1.Get)('/bookmarked_posts/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PostController.prototype, "getBookMarkedPosts", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
     (0, common_1.Post)(),

@@ -22,6 +22,7 @@ const emailconfirmation_service_1 = require("./emailconfirmation.service");
 const phonenumberConfirmation_service_1 = require("./phonenumberConfirmation.service");
 const sms_service_1 = require("../sms/sms.service");
 const sms_module_1 = require("../sms/sms.module");
+const user_service_1 = require("./user.service");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
@@ -58,7 +59,9 @@ AuthModule = __decorate([
             jwt_strategies_1.JwtStrategy,
             emailconfirmation_service_1.EmailConfirmationService,
             phonenumberConfirmation_service_1.PhoneConfirmationService,
+            user_service_1.UserService,
         ],
+        exports: [user_service_1.UserService],
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;

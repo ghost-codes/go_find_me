@@ -13,6 +13,7 @@ import { EmailConfirmationService } from './emailconfirmation.service';
 import { PhoneConfirmationService } from './phonenumberConfirmation.service';
 import { SmsService } from '../sms/sms.service';
 import { SmsModule } from '../sms/sms.module';
+import { UserService } from './user.service';
 
 @Module({
   imports: [
@@ -48,6 +49,8 @@ import { SmsModule } from '../sms/sms.module';
     JwtStrategy,
     EmailConfirmationService,
     PhoneConfirmationService,
+    UserService,
   ],
+  exports: [UserService],
 })
 export class AuthModule {}

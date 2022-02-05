@@ -10,6 +10,7 @@ exports.PostModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const passport_1 = require("@nestjs/passport");
+const user_schema_1 = require("../../global/user.schema");
 const image_upload_module_1 = require("../image-upload/image-upload.module");
 const image_upload_service_1 = require("../image-upload/image-upload.service");
 const push_notification_module_1 = require("../push-notification/push-notification.module");
@@ -17,6 +18,7 @@ const post_controller_1 = require("./post.controller");
 const post_service_1 = require("./post.service");
 const contribution_schema_1 = require("./schema/contribution.schema");
 const post_schema_1 = require("./schema/post.schema");
+const auth_module_1 = require("../auth/auth.module");
 let PostModule = class PostModule {
 };
 PostModule = __decorate([
@@ -40,6 +42,7 @@ PostModule = __decorate([
                     },
                 },
             ]),
+            auth_module_1.AuthModule,
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
             image_upload_service_1.ImageUploadService,
             image_upload_module_1.ImageUploadModule,

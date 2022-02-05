@@ -22,12 +22,15 @@ const image_upload_service_1 = require("../image-upload/image-upload.service");
 const mongoose_4 = require("mongoose");
 const contribution_schema_1 = require("./schema/contribution.schema");
 const push_notification_service_1 = require("../push-notification/push-notification.service");
+const user_service_1 = require("../auth/user.service");
+const user_schema_1 = require("../../global/user.schema");
 let PostService = class PostService {
-    constructor(connection, postModel, imageUploadService, contributionModel, pushNotificationService) {
+    constructor(connection, postModel, contributionModel, userService, imageUploadService, pushNotificationService) {
         this.connection = connection;
         this.postModel = postModel;
-        this.imageUploadService = imageUploadService;
         this.contributionModel = contributionModel;
+        this.userService = userService;
+        this.imageUploadService = imageUploadService;
         this.pushNotificationService = pushNotificationService;
     }
     async getPosts(page) {
@@ -35,6 +38,56 @@ let PostService = class PostService {
             page = 0;
         const posts = await this.postModel
             .find()
+            .sort({ _id: -1 })
+            .skip(page * 20)
+            .limit(20);
+        if (!posts)
+            return { posts: [], next: null, prev: `/api/post/page=${page}` };
+        if (posts.length < 20)
+            return { posts, next: null, prev: `/api/post/page=${page}` };
+        let next = page;
+        return {
+            posts,
+            next: `/api/post/?page=${++next}`,
+            prev: `/api/post/?page=${page}`,
+        };
+    }
+    async getOnePost(id) {
+        if (!id)
+            throw new common_1.InternalServerErrorException('Sorry Error Occured');
+        const post = await this.postModel.findById(id);
+        if (!post)
+            throw new common_1.NotFoundException('Post not found');
+        return { message: 'Success', post: post };
+    }
+    async getCommentsPosts(id) {
+        if (!id)
+            throw new common_1.InternalServerErrorException('Sorry Error Occured');
+        const post = await this.postModel.find({ contributions: id });
+        if (!post)
+            return { posts: [] };
+        return { posts: post };
+    }
+    async getBookmarkedPosts(id) {
+        if (!id)
+            throw new common_1.InternalServerErrorException('Sorry error occured');
+        const user = await this.userService.getSingleUser(id);
+        if (!user)
+            throw new common_1.NotFoundException('User does not exist');
+        console.log(user.bookmarked_posts);
+        const bookmarkedPosts = await this.postModel
+            .find()
+            .where('_id')
+            .in(user.bookmarked_posts);
+        if (!bookmarkedPosts)
+            return { posts: [] };
+        return { posts: bookmarkedPosts };
+    }
+    async getMyPosts(page, id) {
+        if (!page)
+            page = 0;
+        const posts = await this.postModel
+            .find({ user_id: id })
             .sort({ _id: -1 })
             .skip(page * 20)
             .limit(20);
@@ -95,11 +148,12 @@ PostService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_3.InjectConnection)()),
     __param(1, (0, mongoose_1.InjectModel)(post_schema_1.Post.name)),
-    __param(3, (0, mongoose_1.InjectModel)(contribution_schema_1.Contribution.name)),
+    __param(2, (0, mongoose_1.InjectModel)(contribution_schema_1.Contribution.name)),
     __metadata("design:paramtypes", [mongoose_4.Connection,
         mongoose_2.Model,
-        image_upload_service_1.ImageUploadService,
         mongoose_2.Model,
+        user_service_1.UserService,
+        image_upload_service_1.ImageUploadService,
         push_notification_service_1.PushNotificationService])
 ], PostService);
 exports.PostService = PostService;

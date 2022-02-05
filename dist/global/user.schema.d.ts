@@ -7,5 +7,6 @@ export declare class User extends Document {
     confirmed_at: Date;
     password: string;
     passHash: string;
+    bookmarked_posts: string[];
 }
 export declare const UserSchema: import("mongoose").Schema<User, import("mongoose").Model<User, any, any, any>, {}>;

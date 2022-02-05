@@ -25,6 +25,28 @@ export class PostController {
     return this.postService.getPosts(page);
   }
 
+  @Get('/single_post/:id')
+  getOnePost(@Param('id') id: string): Promise<any> {
+    return this.postService.getOnePost(id);
+  }
+
+  @Get('/myposts/:id?')
+  getMyPost(
+    @Param('id') id: string,
+    @Query('page') page: number,
+  ): Promise<any> {
+    return this.postService.getMyPosts(page, id);
+  }
+
+  @Get('/contributed_posts/:id')
+  getCommentedPosts(@Param('id') id: string): Promise<any> {
+    return this.postService.getCommentsPosts(id);
+  }
+
+  @Get('/bookmarked_posts/:id')
+  getBookMarkedPosts(@Param('id') id: string): Promise<any> {
+    return this.postService.getBookmarkedPosts(id);
+  }
   // @Get('page?')
   // getPostsPerPage(@Query('page') page: number): Promise<any> {
   //   return this.postService.getPosts(page);
@@ -54,7 +76,6 @@ export class PostController {
   crateContribution(
     @Body() createContribution: CreateContributionDTO,
   ): Promise<any> {
-    console.log('dddd');
     return this.postService.createContribution(createContribution);
   }
 }
