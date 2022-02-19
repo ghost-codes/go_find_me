@@ -68,6 +68,10 @@ export class AuthService {
     return response;
   }
 
+  async getMe():Promise<any>{
+    
+  }
+
   async changePassword(newPassword: string, token: string): Promise<any> {
     const payload = await this.emailConfirmationService.verifyConfirmationToken(
       token,

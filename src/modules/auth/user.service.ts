@@ -7,6 +7,10 @@ import {
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/global/user.schema';
+import {
+  AuthenticationResponse,
+  UserReponseModel,
+} from './interfaces/auth.interface';
 
 @Injectable()
 export class UserService {
@@ -24,6 +28,19 @@ export class UserService {
   async updateUser(id: string, data: User): Promise<any> {
     const user: User = await this.userModel.findByIdAndUpdate(id, data);
     if (!user) throw new NotFoundException('User not found');
-    return { message: 'User updated' };
+    const updatedUser:User = await this.userModel.findById(id);
+    const response: AuthenticationResponse = {
+      user: {
+        username: userResponse.username,
+        email: userResponse.email,
+        id: userResponse.id,
+        phone_number: userResponse.phone_number,
+        confirmed_at: userResponse.confirmed_at,
+        bookmarked_posts: savedUser.bookmarked_posts,
+      },
+      accessToken: access_token.access_token,
+      refreshToken: refresh_token.refresh_token,
+    };
+    return { message: 'User updated' ,user:response};
   }
 }
