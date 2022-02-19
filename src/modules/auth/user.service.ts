@@ -30,12 +30,12 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     const updatedUser:User = await this.userModel.findById(id);
     const response: AuthenticationResponse =  {
-        username: userResponse.username,
-        email: userResponse.email,
-        id: userResponse.id,
-        phone_number: userResponse.phone_number,
-        confirmed_at: userResponse.confirmed_at,
-        bookmarked_posts: savedUser.bookmarked_posts,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        id: updatedUser.id,
+        phone_number: updatedUser.phone_number,
+        confirmed_at: updatedUser.confirmed_at,
+        bookmarked_posts: updatedUser.bookmarked_posts,
     };
     return { message: 'User updated' ,user:response};
   }
