@@ -29,7 +29,7 @@ export class UserService {
     const user: User = await this.userModel.findByIdAndUpdate(id, data);
     if (!user) throw new NotFoundException('User not found');
     const updatedUser:User = await this.userModel.findById(id);
-    const response: AuthenticationResponse =  {
+    const response =  {
         username: updatedUser.username,
         email: updatedUser.email,
         id: updatedUser.id,
